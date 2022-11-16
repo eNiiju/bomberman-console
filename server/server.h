@@ -24,22 +24,36 @@
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
 
+struct player {
+    pid_t client_pid;
+    struct coordinates coords;
+    bool alive;
+    unsigned int bomb_amount;
+    unsigned int bomb_range;
+};
+
+struct coordinates {
+    unsigned int x;
+    unsigned int y;
+};
+
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 
 /**
- * Initializes the server, mutexes, semaphores, default settings, etc.
+ * Set up and initialize the server, mutexes, semaphores, default settings, etc.
  * @return true if successful, false otherwise
 */
-bool init(void);
+bool setup(void);
 
 /**
  * Function handling signals sent to the server.
  * The protocol is defined in the README.md file.
  * @param signal_number The signal's number.
+ * @param info The signal's informations.
 */
-void signal_handler(int signal_number);
+void signal_handler(int signal_number, siginfo_t* info, void* ucontext);
 
 /**
  * Function handling players' connections.
@@ -58,3 +72,9 @@ void* thread_player(void* arg);
  * @param arg Unused.
 */
 void* thread_game(void* arg);
+
+/**
+ * Creates a player, initializes it's values and adds it to the game.
+ * @param client_pid The client's PID.
+*/
+void create_player(pid_t client_pid);
