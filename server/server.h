@@ -24,17 +24,17 @@
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
 
+struct coordinates {
+    unsigned int x;
+    unsigned int y;
+};
+
 struct player {
     pid_t client_pid;
     struct coordinates coords;
     bool alive;
     unsigned int bomb_amount;
     unsigned int bomb_range;
-};
-
-struct coordinates {
-    unsigned int x;
-    unsigned int y;
 };
 
 /* ------------------------------------------------------------------------- */

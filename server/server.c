@@ -21,6 +21,8 @@ unsigned int nb_players = 0;
 
 int main(int argc, char* argv[])
 {
+    pthread_t thgame;
+
     if (!setup()) {
         printf("Server setup failed.\n");
         return EXIT_FAILURE;
@@ -31,6 +33,11 @@ int main(int argc, char* argv[])
 
     // Wait for the game to start
     pthread_mutex_lock(&mutex_start_game);
+
+    // Start the game
+    printf("Game started!\n");
+    pthread_create(&thgame, NULL, thread_game, NULL);
+    pthread_join(thgame, NULL);
 
     return 0;
 }
