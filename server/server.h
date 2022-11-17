@@ -31,8 +31,8 @@ struct coordinates {
 
 struct player {
     pid_t client_pid;
-    struct coordinates coords;
     bool alive;
+    struct coordinates coords;
     unsigned int bomb_amount;
     unsigned int bomb_range;
 };

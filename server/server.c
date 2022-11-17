@@ -12,8 +12,9 @@
 
 sem_t sem_slots_left; // Semaphore used to know if there are player slots left
 pthread_mutex_t mutex_start_game = PTHREAD_MUTEX_INITIALIZER; // Unlocking this mutex will start the game
+pthread_mutex_t mutex_processing_signal = PTHREAD_MUTEX_INITIALIZER;
 struct player players[MAX_PLAYERS];
-unsigned int nb_players = 0;
+long nb_players = 0;
 
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
@@ -62,11 +63,13 @@ bool setup(void)
 
 void signal_handler(int signal_number, siginfo_t* info, void* ucontext)
 {
+    pthread_mutex_lock(&mutex_processing_signal);
+
     switch (signal_number) {
     case SIGUSR1:
         printf("Received SIGUSR1 by PID %d\n", info->si_pid);
 
-        // Check if there are slots left
+        // If there's a slot left, take it
         if (sem_trywait(&sem_slots_left) == 0) {
             printf("Creating player %d\n", info->si_pid);
             kill(info->si_pid, SIGUSR1); // Reply to the client (OK)
@@ -78,13 +81,16 @@ void signal_handler(int signal_number, siginfo_t* info, void* ucontext)
         }
         break;
     }
+
+    pthread_mutex_unlock(&mutex_processing_signal);
 }
 
 
 
 void* thread_player(void* arg)
 {
-
+    long player_number = (long)arg;
+    printf("Player %ld joined the game.\n", player_number);
 }
 
 
@@ -98,15 +104,19 @@ void* thread_game(void* arg)
 
 void create_player(pid_t client_pid)
 {
-    unsigned int slot = nb_players;
-    nb_players++;
+    pthread_t thplayer;
 
     // Initialize the player
-    players[slot].client_pid = client_pid;
-    players[slot].coords.x = 0;
-    players[slot].coords.y = 0;
-    players[slot].alive = true;
-    players[slot].bomb_amount = 1;
-    players[slot].bomb_range = DEFAULT_BOMB_RANGE;
+    players[nb_players].client_pid = client_pid;
+    players[nb_players].coords.x = 0;
+    players[nb_players].coords.y = 0;
+    players[nb_players].alive = true;
+    players[nb_players].bomb_amount = 1;
+    players[nb_players].bomb_range = DEFAULT_BOMB_RANGE;
+
+    // Create the player thread
+    pthread_create(&thplayer, NULL, thread_player, (void*)nb_players);
+
+    nb_players++;
 }
 
