@@ -7,4 +7,4 @@ clean:
 	rm -f *.o
 
 server: server.c server.h
-	$(CC) $(CFLAGS) server.c -o server
+	$(CC) $(CFLAGS) server.c -o server -lpthread

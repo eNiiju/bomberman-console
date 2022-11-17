@@ -65,19 +65,24 @@ void signal_handler(int signal_number, siginfo_t* info, void* ucontext)
 {
     pthread_mutex_lock(&mutex_processing_signal);
 
+    pid_t signal_pid = info->si_pid;
+
     switch (signal_number) {
     case SIGUSR1:
-        printf("Received SIGUSR1 by PID %d\n", info->si_pid);
+        printf("Received SIGUSR1 by PID %d\n", signal_pid);
 
-        // If there's a slot left, take it
-        if (sem_trywait(&sem_slots_left) == 0) {
-            printf("Creating player %d\n", info->si_pid);
-            kill(info->si_pid, SIGUSR1); // Reply to the client (OK)
-            create_player(info->si_pid);
-        }
-        else {
-            printf("No slots left for player %d\n", info->si_pid);
-            kill(info->si_pid, SIGUSR2); // Reply to the client (NOK)
+        // The client isn't already in the game
+        if (!client_in_game(signal_pid)) {
+            // If there's a slot left, take it
+            if (sem_trywait(&sem_slots_left) == 0) {
+                printf("Creating player %d\n", signal_pid);
+                kill(signal_pid, SIGUSR1); // Reply to the client (OK)
+                create_player(signal_pid);
+            }
+            else {
+                printf("No slots left for player %d\n", signal_pid);
+                kill(signal_pid, SIGUSR2); // Reply to the client (NOK)
+            }
         }
         break;
     }
@@ -120,3 +125,12 @@ void create_player(pid_t client_pid)
     nb_players++;
 }
 
+
+
+bool client_in_game(pid_t client_pid)
+{
+    for (int i = 0; i < nb_players; i++)
+        if (players[i].client_pid == client_pid)
+            return true;
+    return false;
+}

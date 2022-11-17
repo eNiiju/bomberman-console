@@ -78,3 +78,10 @@ void* thread_game(void* arg);
  * @param client_pid The client's PID.
 */
 void create_player(pid_t client_pid);
+
+/**
+ * Returns if the client is in the game or not.
+ * @param client_pid The client's PID.
+ * @return true if the client is in the game, false otherwise.
+*/
+bool client_in_game(pid_t client_pid);
