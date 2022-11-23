@@ -15,6 +15,7 @@ pthread_mutex_t mutex_start_game = PTHREAD_MUTEX_INITIALIZER; // Unlocking this 
 pthread_mutex_t mutex_processing_signal = PTHREAD_MUTEX_INITIALIZER;
 struct player players[MAX_PLAYERS];
 long nb_players = 0;
+int shmid; // Shared memory ID
 
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
@@ -30,7 +31,7 @@ int main(int argc, char* argv[])
     }
 
     // Wait for clients to connect
-    printf("Server is listening with PID %d\n", getpid());
+    printf("Server is listening with code %d\n", PROJECT_ID);
 
     // Wait for the game to start
     pthread_mutex_lock(&mutex_start_game);
@@ -50,11 +51,13 @@ bool setup(void)
     sem_init(&sem_slots_left, 0, MAX_PLAYERS);
     pthread_mutex_lock(&mutex_start_game); // Prevent the game from starting until ordered to do so
 
-    // Signal hangler
+    // Signal handler
     struct sigaction sa;
     sa.sa_flags = SA_SIGINFO;
     sa.sa_sigaction = signal_handler;
     sigaction(SIGUSR1, &sa, NULL);
+ 
+    shmid = createSharedMemory(getpid());
 
     return true;
 }

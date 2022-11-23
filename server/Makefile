@@ -1,10 +1,11 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
 
-all: server
+server: server.c server.h memory.o
+	$(CC) $(CFLAGS) server.c -o server memory.o -lpthread
+
+memory.o: memory.c memory.h
+	$(CC) $(CFLAGS) memory.c -o memory.o -c
 
 clean:
-	rm -f *.o
-
-server: server.c server.h
-	$(CC) $(CFLAGS) server.c -o server -lpthread
+	rm -f *.o server
