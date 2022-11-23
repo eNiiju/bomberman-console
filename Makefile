@@ -3,4 +3,5 @@ all:
 	cd server && make
 
 clean:
-	rm client/client server/server
+	cd client && make clean
+	cd server && make clean
