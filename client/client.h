@@ -7,4 +7,5 @@
 
 #include <stdio.h>
 
+#include "../include/definitions.h"
 #include "message.h"
