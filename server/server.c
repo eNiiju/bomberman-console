@@ -14,6 +14,7 @@ struct player players[MAX_PLAYERS];
 long nb_players = 0;
 int game_code;
 int msqid;
+pthread_mutex_t mut_start_game = PTHREAD_MUTEX_INITIALIZER;
 
 
 
@@ -28,29 +29,20 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    // Wait for clients to connect
+    // Start threads that will handle players' messages
+    pthread_t th_messages[4];
+    pthread_create(&th_messages[0], NULL, thread_message_connection, NULL);
+    pthread_create(&th_messages[1], NULL, thread_message_disconnection, NULL);
+    pthread_create(&th_messages[2], NULL, thread_message_move, NULL);
+    pthread_create(&th_messages[3], NULL, thread_message_place_bomb, NULL);
     printf("Server is listening with code %d\n", game_code);
-    struct message_connection msg_connection;
-    while (nb_players < MAX_PLAYERS) {
-        // Receive a connection message from a client
-        msgrcv(msqid, &msg_connection, sizeof(msg_connection.mcontent), MESSAGE_TYPE_CONNECTION, 0);
 
-        // Create the player (if not already created)
-        bool success = create_player(msg_connection.mcontent.pid);
-
-        send_response(msqid, success, msg_connection.mcontent.pid);
-
-        if (success)
-            printf("Player %d joined the game.\n", msg_connection.mcontent.pid);
-        else
-            printf("Player %d already connected.\n", msg_connection.mcontent.pid);
-    }
-
-    // Start the game
+    // Start the game when the mutex is unlocked
+    pthread_mutex_lock(&mut_start_game);
+    pthread_t th_game;
+    pthread_create(&th_game, NULL, thread_game, NULL);
     printf("Game started!\n");
-    pthread_t thgame;
-    pthread_create(&thgame, NULL, thread_game, NULL);
-    pthread_join(thgame, NULL);
+    pthread_join(th_game, NULL);
 
     return 0;
 }
@@ -59,6 +51,9 @@ int main(void)
 
 bool setup(void)
 {
+    // Prevent the game from starting
+    pthread_mutex_lock(&mut_start_game);
+
     // Generate game code
     srand(time(NULL));
     game_code = rand() % 10000;
@@ -120,4 +115,50 @@ bool client_in_game(pid_t client_pid)
         if (players[i].client_pid == client_pid)
             return true;
     return false;
+}
+
+
+
+void* thread_message_connection(void* arg)
+{
+    struct message_connection msg_connection;
+    while (true) {
+        // Receive a connection message from a client
+        msgrcv(msqid, &msg_connection, sizeof(msg_connection.mcontent), MESSAGE_TYPE_CONNECTION, 0);
+
+        if (nb_players < MAX_PLAYERS) {
+            bool success = create_player(msg_connection.mcontent.pid);
+            send_response(msqid, success, msg_connection.mcontent.pid);
+
+            if (success)
+                printf("Player %d joined the game.\n", msg_connection.mcontent.pid);
+            
+            // If the players is now full, unlock the mutex to start the game
+            if (nb_players == MAX_PLAYERS)
+                pthread_mutex_unlock(&mut_start_game);
+        }
+        else
+            send_response(msqid, false, msg_connection.mcontent.pid);
+    }
+}
+
+
+
+void* thread_message_disconnection(void* arg)
+{
+
+}
+
+
+
+void* thread_message_move(void* arg)
+{
+    
+}
+
+
+
+void* thread_message_place_bomb(void* arg)
+{
+    
 }

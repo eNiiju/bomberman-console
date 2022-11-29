@@ -82,3 +82,11 @@ bool create_player(pid_t client_pid);
  * @return true if the client is in the game, false otherwise.
 */
 bool client_in_game(pid_t client_pid);
+
+void* thread_message_connection(void* arg);
+
+void* thread_message_disconnection(void* arg);
+
+void* thread_message_move(void* arg);
+
+void* thread_message_place_bomb(void* arg);
