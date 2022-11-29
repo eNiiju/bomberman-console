@@ -26,7 +26,6 @@
 #define BOMB_TIMER 3
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
-#define TOKEN_PROJECT_ID 42
 
 struct coordinates {
     unsigned int x;

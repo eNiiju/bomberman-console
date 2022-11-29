@@ -16,7 +16,7 @@
 /*                          Constants & definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define TOKEN_PROJECT_ID 42
+#define GAME_CODE 42
 #define TOKEN_PATH_NAME "/etc/passwd"
 
 #define MESSAGE_TYPE_CONNECTION 1
@@ -78,9 +78,10 @@ struct message_response {
 
 /**
  * Create a message queue.
+ * @param game_code The game code.
  * @return The message queue ID if successful, -1 otherwise
 */
-int create_message_queue(void);
+int create_message_queue(int game_code);
 
 /**
  * Send a response to the client.

@@ -10,9 +10,9 @@
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-int create_message_queue(void)
+int create_message_queue(int game_code)
 {
-    return msgget(ftok(TOKEN_PATH_NAME, TOKEN_PROJECT_ID), IPC_CREAT | IPC_EXCL | 0666);
+    return msgget(ftok(TOKEN_PATH_NAME, game_code), IPC_CREAT | IPC_EXCL | 0666);
 }
 
 bool send_response(int msqid, bool success, pid_t pid_client)

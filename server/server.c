@@ -12,7 +12,9 @@
 
 struct player players[MAX_PLAYERS];
 long nb_players = 0;
+int game_code;
 int msqid;
+
 
 
 /* ------------------------------------------------------------------------- */
@@ -21,23 +23,20 @@ int msqid;
 
 int main(void)
 {
-    pthread_t thgame;
-    struct message_connection msg_connection;
-    bool success;
-
     if (!setup()) {
         printf("Server setup failed.\n");
         return EXIT_FAILURE;
     }
 
     // Wait for clients to connect
-    printf("Server is listening with code %d\n", TOKEN_PROJECT_ID);
+    printf("Server is listening with code %d\n", game_code);
+    struct message_connection msg_connection;
     while (nb_players < MAX_PLAYERS) {
         // Receive a connection message from a client
         msgrcv(msqid, &msg_connection, sizeof(msg_connection.mcontent), MESSAGE_TYPE_CONNECTION, 0);
 
         // Create the player (if not already created)
-        success = create_player(msg_connection.mcontent.pid);
+        bool success = create_player(msg_connection.mcontent.pid);
 
         send_response(msqid, success, msg_connection.mcontent.pid);
 
@@ -49,6 +48,7 @@ int main(void)
 
     // Start the game
     printf("Game started!\n");
+    pthread_t thgame;
     pthread_create(&thgame, NULL, thread_game, NULL);
     pthread_join(thgame, NULL);
 
@@ -59,8 +59,12 @@ int main(void)
 
 bool setup(void)
 {
+    // Generate game code
+    srand(time(NULL));
+    game_code = rand() % 10000;
+
     // Create message queue
-    msqid = create_message_queue();
+    msqid = create_message_queue(game_code);
     if (msqid == -1) {
         perror("Error while creating message queue");
         return false;
