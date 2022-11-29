@@ -10,20 +10,20 @@
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
-sem_t sem_slots_left; // Semaphore used to know if there are player slots left
-pthread_mutex_t mutex_start_game = PTHREAD_MUTEX_INITIALIZER; // Unlocking this mutex will start the game
-pthread_mutex_t mutex_processing_signal = PTHREAD_MUTEX_INITIALIZER;
 struct player players[MAX_PLAYERS];
 long nb_players = 0;
-int shmid; // Shared memory ID
+int msqid;
+
 
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-int main(int argc, char* argv[])
+int main(void)
 {
     pthread_t thgame;
+    struct message_connection msg_connection;
+    bool success;
 
     if (!setup()) {
         printf("Server setup failed.\n");
@@ -31,10 +31,21 @@ int main(int argc, char* argv[])
     }
 
     // Wait for clients to connect
-    printf("Server is listening with code %d\n", PROJECT_ID);
+    printf("Server is listening with code %d\n", TOKEN_PROJECT_ID);
+    while (nb_players < MAX_PLAYERS) {
+        // Receive a connection message from a client
+        msgrcv(msqid, &msg_connection, sizeof(msg_connection.mcontent), MESSAGE_TYPE_CONNECTION, 0);
 
-    // Wait for the game to start
-    pthread_mutex_lock(&mutex_start_game);
+        // Create the player (if not already created)
+        success = create_player(msg_connection.mcontent.pid);
+
+        send_response(msqid, success, msg_connection.mcontent.pid);
+
+        if (success)
+            printf("Player %d joined the game.\n", msg_connection.mcontent.pid);
+        else
+            printf("Player %d already connected.\n", msg_connection.mcontent.pid);
+    }
 
     // Start the game
     printf("Game started!\n");
@@ -48,49 +59,14 @@ int main(int argc, char* argv[])
 
 bool setup(void)
 {
-    sem_init(&sem_slots_left, 0, MAX_PLAYERS);
-    pthread_mutex_lock(&mutex_start_game); // Prevent the game from starting until ordered to do so
-
-    // Signal handler
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sa.sa_sigaction = signal_handler;
-    sigaction(SIGUSR1, &sa, NULL);
- 
-    shmid = createSharedMemory(getpid());
-
-    return true;
-}
-
-
-
-void signal_handler(int signal_number, siginfo_t* info, void* ucontext)
-{
-    pthread_mutex_lock(&mutex_processing_signal);
-
-    pid_t signal_pid = info->si_pid;
-
-    switch (signal_number) {
-    case SIGUSR1:
-        printf("Received SIGUSR1 by PID %d\n", signal_pid);
-
-        // The client isn't already in the game
-        if (!client_in_game(signal_pid)) {
-            // If there's a slot left, take it
-            if (sem_trywait(&sem_slots_left) == 0) {
-                printf("Creating player %d\n", signal_pid);
-                kill(signal_pid, SIGUSR1); // Reply to the client (OK)
-                create_player(signal_pid);
-            }
-            else {
-                printf("No slots left for player %d\n", signal_pid);
-                kill(signal_pid, SIGUSR2); // Reply to the client (NOK)
-            }
-        }
-        break;
+    // Create message queue
+    msqid = create_message_queue();
+    if (msqid == -1) {
+        perror("Error while creating message queue");
+        return false;
     }
 
-    pthread_mutex_unlock(&mutex_processing_signal);
+    return true;
 }
 
 
@@ -110,8 +86,12 @@ void* thread_game(void* arg)
 
 
 
-void create_player(pid_t client_pid)
+bool create_player(pid_t client_pid)
 {
+    // If the player already exists, do nothing
+    if (client_in_game(client_pid))
+        return false;
+
     pthread_t thplayer;
 
     // Initialize the player
@@ -126,6 +106,7 @@ void create_player(pid_t client_pid)
     pthread_create(&thplayer, NULL, thread_player, (void*)nb_players);
 
     nb_players++;
+    return true;
 }
 
 

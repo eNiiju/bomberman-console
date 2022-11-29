@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#include "memory.h"
+#include "message.h"
 
 /* ------------------------------------------------------------------------- */
 /*                          Constants & definitions                          */
@@ -23,8 +23,10 @@
 #define MAX_PLAYERS 4
 #define MIN_PLAYERS 2
 #define DEFAULT_BOMB_RANGE 3
+#define BOMB_TIMER 3
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
+#define TOKEN_PROJECT_ID 42
 
 struct coordinates {
     unsigned int x;
@@ -44,18 +46,10 @@ struct player {
 /* ------------------------------------------------------------------------- */
 
 /**
- * Set up and initialize the server, mutexes, semaphores, default settings, etc.
+ * Set up and initialize the server.
  * @return true if successful, false otherwise
 */
 bool setup(void);
-
-/**
- * Function handling signals sent to the server.
- * The protocol is defined in the README.md file.
- * @param signal_number The signal's number.
- * @param info The signal's informations.
-*/
-void signal_handler(int signal_number, siginfo_t* info, void* ucontext);
 
 /**
  * Function handling players' connections.
@@ -76,10 +70,12 @@ void* thread_player(void* arg);
 void* thread_game(void* arg);
 
 /**
- * Creates a player, initializes it's values and adds it to the game.
+ * Creates a player if it's not already added, initializes it's values and
+ * adds it to the game.
  * @param client_pid The client's PID.
+ * @return true if successful, false otherwise.
 */
-void create_player(pid_t client_pid);
+bool create_player(pid_t client_pid);
 
 /**
  * Returns if the client is in the game or not.
