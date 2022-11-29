@@ -18,30 +18,6 @@
 #include "message.h"
 
 /* ------------------------------------------------------------------------- */
-/*                          Constants & definitions                          */
-/* ------------------------------------------------------------------------- */
-
-#define MAX_PLAYERS 4
-#define MIN_PLAYERS 2
-#define DEFAULT_BOMB_RANGE 3
-#define BOMB_TIMER 3
-#define MAP_WIDTH 15
-#define MAP_HEIGHT 15
-
-struct coordinates {
-    unsigned int x;
-    unsigned int y;
-};
-
-struct player {
-    pid_t client_pid;
-    bool alive;
-    struct coordinates coords;
-    unsigned int bomb_amount;
-    unsigned int bomb_range;
-};
-
-/* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 

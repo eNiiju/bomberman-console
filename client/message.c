@@ -13,7 +13,7 @@
 bool send_message_connection(int msqid, pid_t pid)
 {
     struct message_connection msg_connection = {
-        .mtype = MESSAGE_TYPE_CONNECTION,
+        .mtype = MESSAGE_TYPE_CLIENT_CONNECTION,
         .mcontent = {
             .pid = pid
         }
@@ -26,7 +26,7 @@ bool send_message_connection(int msqid, pid_t pid)
 bool send_message_disconnection(int msqid, pid_t pid)
 {
     struct message_disconnection msg_disconnection = {
-        .mtype = MESSAGE_TYPE_DISCONNECTION,
+        .mtype = MESSAGE_TYPE_CLIENT_DISCONNECTION,
         .mcontent = {
             .pid = pid
         }
@@ -39,7 +39,7 @@ bool send_message_disconnection(int msqid, pid_t pid)
 bool send_message_move(int msqid, pid_t pid, int direction)
 {
     struct message_move msg_move = {
-        .mtype = MESSAGE_TYPE_MOVE,
+        .mtype = MESSAGE_TYPE_CLIENT_MOVE,
         .mcontent = {
             .pid = pid,
             .direction = direction
@@ -53,19 +53,10 @@ bool send_message_move(int msqid, pid_t pid, int direction)
 bool send_message_place_bomb(int msqid, pid_t pid)
 {
     struct message_place_bomb msg_place_bomb = {
-        .mtype = MESSAGE_TYPE_PLACE_BOMB,
+        .mtype = MESSAGE_TYPE_CLIENT_PLACE_BOMB,
         .mcontent = {
             .pid = pid
         }
     };
     return msgsnd(msqid, &msg_place_bomb, sizeof(msg_place_bomb.mcontent), 0) != -1;
-}
-
-
-
-bool receive_message_response(int msqid, pid_t pid)
-{
-    struct message_response msg_response;
-    msgrcv(msqid, &msg_response, sizeof(msg_response.mcontent), pid, 0);
-    return msg_response.mcontent.success;
 }

@@ -11,21 +11,21 @@
 /* ------------------------------------------------------------------------- */
 
 struct message_connection {
-    long mtype; // MESSAGE_TYPE_CONNECTION
+    long mtype; // MESSAGE_TYPE_CLIENT_CONNECTION
     struct {
         pid_t pid; // PID of the client
     } mcontent;
 };
 
 struct message_disconnection {
-    long mtype; // MESSAGE_TYPE_DISCONNECTION
+    long mtype; // MESSAGE_TYPE_CLIENT_DISCONNECTION
     struct {
         pid_t pid; // PID of the client
     } mcontent;
 };
 
 struct message_move {
-    long mtype; // MESSAGE_TYPE_MOVE
+    long mtype; // MESSAGE_TYPE_CLIENT_MOVE
     struct {
         pid_t pid; // PID of the client
         int direction; // DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT or DIRECTION_RIGHT
@@ -33,7 +33,7 @@ struct message_move {
 };
 
 struct message_place_bomb {
-    long mtype; // MESSAGE_TYPE_PLACE_BOMB
+    long mtype; // MESSAGE_TYPE_CLIENT_PLACE_BOMB
     struct {
         pid_t pid; // PID of the client
     } mcontent;
@@ -43,10 +43,12 @@ struct message_place_bomb {
 /*                        Messages sent by the server                        */
 /* ------------------------------------------------------------------------- */
 
-struct message_response {
+struct message_server {
     long mtype; // PID of the client
     struct {
         pid_t pid; // PID of the server
+        int type; // MESSAGE_TYPE_SERVER_*
         bool success; // true if the request was successful, false otherwise
+        struct game game; // Game state
     } mcontent;
 };

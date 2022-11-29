@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "message_types.h": "c"
+        "message_types.h": "c",
+        "pthread.h": "c"
     }
 }

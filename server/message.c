@@ -19,11 +19,12 @@ int create_message_queue(int game_code)
 
 bool send_response(int msqid, bool success, pid_t pid_client)
 {
-    struct message_response response = {
+    struct message_server response = {
         .mtype = pid_client,
         .mcontent = {
-            .success = success,
-            .pid = getpid()
+            .pid = getpid(),
+            .type = MESSAGE_TYPE_SERVER_RESPONSE,
+            .success = success
         }
     };
     return msgsnd(msqid, &response, sizeof(response.mcontent), 0) != -1;
