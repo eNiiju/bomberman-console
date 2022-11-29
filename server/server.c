@@ -78,7 +78,6 @@ bool setup(void)
 void* thread_player(void* arg)
 {
     long player_number = (long)arg;
-    printf("Player %ld joined the game.\n", player_number);
 }
 
 
