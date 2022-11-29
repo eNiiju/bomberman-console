@@ -1,5 +1,7 @@
 /**
- * 
+ * Message type structure definitions for the client and the server.
+ * @file message_types.h
+ * @date 2022-11-29
 */
 
 #include <sys/types.h>

@@ -84,10 +84,30 @@ bool create_player(pid_t client_pid);
 */
 bool client_in_game(pid_t client_pid);
 
+/**
+ * Function for the thread handling the "connection" messages.
+ * It is created as a thread once the server starts.
+ * @param arg Unused.
+*/
 void* thread_message_connection(void* arg);
 
+/**
+ * Function for the thread handling the "disconnection" messages.
+ * It is created as a thread once the server starts.
+ * @param arg Unused.
+*/
 void* thread_message_disconnection(void* arg);
 
+/**
+ * Function for the thread handling the "move" messages.
+ * It is created as a thread once the server starts.
+ * @param arg Unused.
+*/
 void* thread_message_move(void* arg);
 
+/**
+ * Function for the thread handling the "place bomb" messages.
+ * It is created as a thread once the server starts.
+ * @param arg Unused.
+*/
 void* thread_message_place_bomb(void* arg);

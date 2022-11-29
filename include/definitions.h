@@ -1,5 +1,7 @@
 /**
- *   
+ * Constants & definitions for the client and the server.
+ * @file definitions.h
+ * @date 2022-11-29
  */
 
 #define GAME_CODE 42
