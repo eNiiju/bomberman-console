@@ -34,3 +34,28 @@ int create_message_queue(int game_code);
  * @return true if the message was sent successfully, false otherwise
 */
 bool send_connection_response(int main_msqid, bool success, pid_t pid_client);
+
+/**
+ * Send a response to the client regarding it's request.
+ * @param client_msqid The destination client's message queue ID
+ * @param success true if the request was successful, false otherwise
+ * @return true if the message was sent successfully, false otherwise
+*/
+bool send_response(pid_t client_msqid, bool success);
+
+/**
+ * Send a message to the client containing the game state.
+ * It also indicates that the game has started.
+ * @param client_msqid The destination client's message queue ID
+ * @param game_state The game state
+ * @return true if the message was sent successfully, false otherwise
+*/
+bool send_game_state(pid_t client_msqid, struct game game_state);
+
+/**
+ * Send a message to the client to tell it that the game has ended.
+ * @param client_msqid The destination client's message queue ID
+ * @param winner The winner's player index
+ * @return true if the message was sent successfully, false otherwise
+*/
+bool send_game_end(pid_t client_msqid, int winner);

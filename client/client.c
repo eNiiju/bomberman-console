@@ -45,6 +45,7 @@ int main(void)
 
     // Retrieve the client's message queue ID
     client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);
+ 
 
     return 0;
 }

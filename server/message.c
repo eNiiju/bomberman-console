@@ -19,11 +19,50 @@ int create_message_queue(int project_id)
 
 bool send_connection_response(int main_msqid, bool success, pid_t pid_client)
 {
-    struct message_server_response response = {
+    struct message_server_response msg = {
         .mtype = pid_client,
         .mcontent = {
             .success = success
         }
     };
-    return msgsnd(main_msqid, &response, sizeof(response.mcontent), 0) != -1;
+    return msgsnd(main_msqid, &msg, sizeof(msg.mcontent), 0) != -1;
+}
+
+
+
+bool send_response(pid_t client_msqid, bool success)
+{
+    struct message_server_response msg = {
+        .mtype = MESSAGE_SERVER_RESPONSE_TYPE,
+        .mcontent = {
+            .success = success
+        }
+    };
+    return msgsnd(client_msqid, &msg, sizeof(msg.mcontent), 0) != -1;
+}
+
+
+
+bool send_game_state(pid_t client_msqid, struct game game_state)
+{
+struct message_server_game_state msg = {
+        .mtype = MESSAGE_SERVER_GAME_STATE_TYPE,
+        .mcontent = {
+            .game_state = game_state
+        }
+    };
+    return msgsnd(client_msqid, &msg, sizeof(msg.mcontent), 0) != -1;
+}
+
+
+
+bool send_game_end(pid_t client_msqid, int winner)
+{
+    struct message_server_game_end msg = {
+        .mtype = MESSAGE_SERVER_GAME_END_TYPE,
+        .mcontent = {
+            .winner = winner
+        }
+    };
+    return msgsnd(client_msqid, &msg, sizeof(msg.mcontent), 0) != -1;
 }

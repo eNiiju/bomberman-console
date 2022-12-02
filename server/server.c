@@ -72,12 +72,13 @@ bool setup(void)
 void* thread_player(void* arg)
 {
     long player_number = (long)arg;
+    pid_t pid_client = game.players[player_number].pid_client;
 
     // Create player message queue with the client ID as projet ID when generating the token
-    create_message_queue(game.players[player_number].pid_client);
+    create_message_queue(pid_client);
 
     // Send response to client
-    send_connection_response(game.msqid, true, game.players[player_number].pid_client);
+    send_connection_response(game.msqid, true, pid_client);
 
     // Wait for client's messages
     // TODO
@@ -87,7 +88,7 @@ void* thread_player(void* arg)
 
 void* thread_game(void* arg)
 {
-
+    
 }
 
 

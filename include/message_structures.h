@@ -43,14 +43,14 @@ struct message_server_response {
     } mcontent;
 };
 
-struct message_game_state {
+struct message_server_game_state {
     long mtype; // MESSAGE_SERVER_GAME_STATE_TYPE
     struct {
         struct game game_state;
     } mcontent;
 };
 
-struct message_game_end {
+struct message_server_game_end {
     long mtype; // MESSAGE_SERVER_GAME_END_TYPE
     struct {
         int winner; // Winner's player index, -1 if no winner
