@@ -28,7 +28,7 @@
 bool setup(void);
 
 /**
- * Function handling players' connections.
+ * Function handling players' actions.
  * It is created as a thread once a player joins the game.
  * It is responsible for the communication between the server and the client,
  * including receiving player's inputs and take them into account for the game.
@@ -48,42 +48,21 @@ void* thread_game(void* arg);
 /**
  * Creates a player if it's not already added, initializes it's values and
  * adds it to the game.
- * @param client_pid The client's PID.
+ * @param pid_client The client's PID.
  * @return true if successful, false otherwise.
 */
-bool create_player(pid_t client_pid);
+bool create_player(pid_t pid_client);
 
 /**
  * Returns if the client is in the game or not.
- * @param client_pid The client's PID.
+ * @param pid_client The client's PID.
  * @return true if the client is in the game, false otherwise.
 */
-bool client_in_game(pid_t client_pid);
+bool client_in_game(pid_t pid_client);
 
 /**
  * Function for the thread handling the "connection" messages.
  * It is created as a thread once the server starts.
  * @param arg Unused.
 */
-void* thread_message_connection(void* arg);
-
-/**
- * Function for the thread handling the "disconnection" messages.
- * It is created as a thread once the server starts.
- * @param arg Unused.
-*/
-void* thread_message_disconnection(void* arg);
-
-/**
- * Function for the thread handling the "move" messages.
- * It is created as a thread once the server starts.
- * @param arg Unused.
-*/
-void* thread_message_move(void* arg);
-
-/**
- * Function for the thread handling the "place bomb" messages.
- * It is created as a thread once the server starts.
- * @param arg Unused.
-*/
-void* thread_message_place_bomb(void* arg);
+void* thread_main_message_queue(void* arg);

@@ -10,45 +10,49 @@
 /*                        Messages sent by the client                        */
 /* ------------------------------------------------------------------------- */
 
-struct message_connection {
-    long mtype; // MESSAGE_TYPE_CLIENT_CONNECTION
+struct message_client_connection {
+    long mtype; // MESSAGE_CLIENT_CONNECTION_TYPE
     struct {
-        pid_t pid; // PID of the client
+        pid_t pid_client;
     } mcontent;
 };
 
-struct message_disconnection {
-    long mtype; // MESSAGE_TYPE_CLIENT_DISCONNECTION
-    struct {
-        pid_t pid; // PID of the client
-    } mcontent;
+struct message_client_disconnection {
+    long mtype; // MESSAGE_CLIENT_DISCONNECTION_TYPE
 };
 
-struct message_move {
-    long mtype; // MESSAGE_TYPE_CLIENT_MOVE
+struct message_client_move {
+    long mtype; // MESSAGE_CLIENT_MOVE_TYPE
     struct {
-        pid_t pid; // PID of the client
         int direction; // DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT or DIRECTION_RIGHT
     } mcontent;
 };
 
-struct message_place_bomb {
-    long mtype; // MESSAGE_TYPE_CLIENT_PLACE_BOMB
-    struct {
-        pid_t pid; // PID of the client
-    } mcontent;
+struct message_client_place_bomb {
+    long mtype; // MESSAGE_CLIENT_PLACE_BOMB_TYPE
 };
 
 /* ------------------------------------------------------------------------- */
 /*                        Messages sent by the server                        */
 /* ------------------------------------------------------------------------- */
 
-struct message_server {
+struct message_server_response {
     long mtype; // PID of the client
     struct {
-        pid_t pid; // PID of the server
-        int type; // MESSAGE_TYPE_SERVER_*
         bool success; // true if the request was successful, false otherwise
-        struct game game; // Game state
+    } mcontent;
+};
+
+struct message_game_state {
+    long mtype; // MESSAGE_SERVER_GAME_STATE_TYPE
+    struct {
+        struct game game_state;
+    } mcontent;
+};
+
+struct message_game_end {
+    long mtype; // MESSAGE_SERVER_GAME_END_TYPE
+    struct {
+        int winner;
     } mcontent;
 };

@@ -21,33 +21,30 @@
 
 /**
  * Sends a "connection" message to the server.
- * @param msqid The message queue ID.
- * @param pid_client The client's PID.
- * @return true if successful, false otherwise
+ * @param main_msqid The main message queue ID.
+ * @param pid The client's PID.
+ * @return true if the message was sent successfully, false otherwise
 */
-bool send_message_connection(int msqid, pid_t pid);
+bool send_message_connection(int main_msqid, pid_t pid);
 
 /**
  * Sends a "disconnection" message to the server.
- * @param msqid The message queue ID.
- * @param pid_client The client's PID.
- * @return true if successful, false otherwise
+ * @param client_msqid The client's message queue ID.
+ * @return true if the message was sent successfully, false otherwise
 */
-bool send_message_disconnection(int msqid, pid_t pid);
+bool send_message_disconnection(int client_msqid);
 
 /**
  * Sends a "move" message to the server.
- * @param msqid The message queue ID.
- * @param pid_client The client's PID.
+ * @param client_msqid The client's message queue ID.
  * @param direction The direction the player wants to move.
- * @return true if successful, false otherwise
+ * @return true if the message was sent successfully, false otherwise
 */
-bool send_message_move(int msqid, pid_t pid, int direction);
+bool send_message_move(int client_msqid, int direction);
 
 /**
  * Sends a "place bomb" message to the server.
- * @param msqid The message queue ID.
- * @param pid_client The client's PID.
- * @return true if successful, false otherwise
+ * @param client_msqid The client's message queue ID.
+ * @return true if the message was sent successfully, false otherwise
 */
-bool send_message_place_bomb(int msqid, pid_t pid);
+bool send_message_place_bomb(int client_msqid);

@@ -9,9 +9,3 @@
 
 #include "../include/definitions.h"
 #include "message.h"
-
-/* ------------------------------------------------------------------------- */
-/*                            Function prototypes                            */
-/* ------------------------------------------------------------------------- */
-
-void* thread_handle_messages(void* arg);

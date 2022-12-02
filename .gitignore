@@ -1,2 +1,4 @@
 client/client
+client/*.o
 server/server
+server/*.o

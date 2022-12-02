@@ -31,12 +31,9 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    // Start threads that will handle players' messages
-    pthread_t th_messages[4];
-    pthread_create(&th_messages[0], NULL, thread_message_connection, NULL);
-    pthread_create(&th_messages[1], NULL, thread_message_disconnection, NULL);
-    pthread_create(&th_messages[2], NULL, thread_message_move, NULL);
-    pthread_create(&th_messages[3], NULL, thread_message_place_bomb, NULL);
+    // Start thread that will handle players' messages in main message queue (connections)
+    pthread_t th_main_msq;
+    pthread_create(&th_main_msq, NULL, thread_main_message_queue, NULL);
     printf("Server is listening with code %d\n", game.game_code);
 
     // Start the game when the mutex is unlocked
@@ -60,7 +57,7 @@ bool setup(void)
     srand(time(NULL));
     game.game_code = rand() % 10000;
 
-    // Create message queue
+    // Create main message queue
     game.msqid = create_message_queue(game.game_code);
     if (game.msqid == -1) {
         perror("Error while creating message queue");
@@ -75,6 +72,15 @@ bool setup(void)
 void* thread_player(void* arg)
 {
     long player_number = (long)arg;
+
+    // Create player message queue with the client ID as projet ID when generating the token
+    create_message_queue(game.players[player_number].pid_client);
+
+    // Send response to client
+    send_connection_response(game.msqid, true, game.players[player_number].pid_client);
+
+    // Wait for client's messages
+    // TODO
 }
 
 
@@ -86,14 +92,14 @@ void* thread_game(void* arg)
 
 
 
-bool create_player(pid_t client_pid)
+bool create_player(pid_t pid_client)
 {
     // If the player already exists, do nothing
-    if (client_in_game(client_pid))
+    if (client_in_game(pid_client))
         return false;
 
     // Initialize the player
-    game.players[game.player_count].client_pid = client_pid;
+    game.players[game.player_count].pid_client = pid_client;
     game.players[game.player_count].coords.x = 0;
     game.players[game.player_count].coords.y = 0;
     game.players[game.player_count].alive = true;
@@ -110,56 +116,33 @@ bool create_player(pid_t client_pid)
 
 
 
-bool client_in_game(pid_t client_pid)
+bool client_in_game(pid_t pid_client)
 {
     for (int i = 0; i < game.player_count; i++)
-        if (game.players[i].client_pid == client_pid)
+        if (game.players[i].pid_client == pid_client)
             return true;
     return false;
 }
 
 
 
-void* thread_message_connection(void* arg)
+void* thread_main_message_queue(void* arg)
 {
-    struct message_connection msg_connection;
+    struct message_client_connection msg;
     while (true) {
         // Receive a connection message from a client
-        msgrcv(game.msqid, &msg_connection, sizeof(msg_connection.mcontent), MESSAGE_TYPE_CLIENT_CONNECTION, 0);
+        msgrcv(game.msqid, &msg, sizeof(msg.mcontent), MESSAGE_CLIENT_CONNECTION_TYPE, 0);
+        pid_t pid_client = msg.mcontent.pid_client;
 
         if (game.player_count < MAX_PLAYERS) {
-            bool success = create_player(msg_connection.mcontent.pid);
-            send_response(game.msqid, success, msg_connection.mcontent.pid);
-
-            if (success)
-                printf("Player %d joined the game.\n", msg_connection.mcontent.pid);
+            bool created = create_player(pid_client);
+            send_connection_response(game.msqid, created, pid_client);
             
             // If the players is now full, unlock the mutex to start the game
             if (game.player_count == MAX_PLAYERS)
                 pthread_mutex_unlock(&mut_start_game);
         }
         else
-            send_response(game.msqid, false, msg_connection.mcontent.pid);
+            send_connection_response(game.msqid, false, pid_client);
     }
-}
-
-
-
-void* thread_message_disconnection(void* arg)
-{
-
-}
-
-
-
-void* thread_message_move(void* arg)
-{
-    
-}
-
-
-
-void* thread_message_place_bomb(void* arg)
-{
-    
 }

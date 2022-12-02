@@ -10,22 +10,20 @@
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-int create_message_queue(int game_code)
+int create_message_queue(int project_id)
 {
-    return msgget(ftok(TOKEN_PATH_NAME, game_code), IPC_CREAT | IPC_EXCL | 0666);
+    return msgget(ftok(TOKEN_PATH_NAME, project_id), IPC_CREAT | IPC_EXCL | 0666);
 }
 
 
 
-bool send_response(int msqid, bool success, pid_t pid_client)
+bool send_connection_response(int main_msqid, bool success, pid_t pid_client)
 {
-    struct message_server response = {
+    struct message_server_response response = {
         .mtype = pid_client,
         .mcontent = {
-            .pid = getpid(),
-            .type = MESSAGE_TYPE_SERVER_RESPONSE,
             .success = success
         }
     };
-    return msgsnd(msqid, &response, sizeof(response.mcontent), 0) != -1;
+    return msgsnd(main_msqid, &response, sizeof(response.mcontent), 0) != -1;
 }

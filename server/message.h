@@ -27,9 +27,10 @@
 int create_message_queue(int game_code);
 
 /**
- * Send a response to the client.
- * @param msqid The message queue ID
+ * Send a response to the client regarding it's connection request.
+ * @param main_msqid The main message queue ID
  * @param success true if the request was successful, false otherwise
  * @param pid_client The PID of the client to send the response to
+ * @return true if the message was sent successfully, false otherwise
 */
-bool send_response(int msqid, bool success, pid_t pid_client);
+bool send_connection_response(int main_msqid, bool success, pid_t pid_client);
