@@ -44,9 +44,9 @@ struct player {
 
 struct game {
     int game_code;
-    int msqid;
+    int msqid; // Main message queue ID
     bool ended;
-    int winner;
+    int winner; // Winner's player index,-1 if no winner
     struct player players[MAX_PLAYERS];
     int player_count;
     char map[MAP_WIDTH][MAP_HEIGHT];

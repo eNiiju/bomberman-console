@@ -13,7 +13,7 @@
 #include <sys/msg.h>
 
 #include "../include/definitions.h"
-#include "../include/message_types.h"
+#include "../include/message_structures.h"
 
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */

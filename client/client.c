@@ -11,6 +11,7 @@
 /* ------------------------------------------------------------------------- */
 
 pid_t pid;
+int client_msqid;
 
 
 
@@ -39,9 +40,11 @@ int main(void)
         printf("Connection refused.\n");
         return EXIT_FAILURE;
     }
-    else {
-        printf("Connected.\n");
-    }
+
+    printf("Connected.\n");
+
+    // Retrieve the client's message queue ID
+    client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);
 
     return 0;
 }

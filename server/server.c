@@ -99,12 +99,13 @@ bool create_player(pid_t pid_client)
         return false;
 
     // Initialize the player
-    game.players[game.player_count].pid_client = pid_client;
-    game.players[game.player_count].coords.x = 0;
-    game.players[game.player_count].coords.y = 0;
-    game.players[game.player_count].alive = true;
-    game.players[game.player_count].bomb_amount = 1;
-    game.players[game.player_count].bomb_range = DEFAULT_BOMB_RANGE;
+    game.players[game.player_count] = (struct player) {
+        .pid_client = pid_client,
+        .coords = {0, 0},
+        .alive = true,
+        .bomb_amount = 1,
+        .bomb_range = DEFAULT_BOMB_RANGE
+    };
 
     // Create the player thread
     pthread_t thplayer;
