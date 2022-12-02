@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
+CFLAGS=-Wall -Wextra -Wno-unused-parameter
 INCLUDE=../include
 
 server: server.c server.h $(INCLUDE)/definitions.h message.o

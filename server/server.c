@@ -34,13 +34,12 @@ int main(void)
     // Start thread that will handle players' messages in main message queue (connections)
     pthread_t th_main_msq;
     pthread_create(&th_main_msq, NULL, thread_main_message_queue, NULL);
-    printf("Server is listening with code %d\n", game.game_code);
+    printf("Server is listening with code %d\n\n", game.game_code);
 
     // Start the game when the mutex is unlocked
     pthread_mutex_lock(&mut_start_game);
     pthread_t th_game;
     pthread_create(&th_game, NULL, thread_game, NULL);
-    printf("Game started!\n");
     pthread_join(th_game, NULL);
 
     return 0;
@@ -80,19 +79,35 @@ void* thread_player(void* arg)
     // Send response to client
     send_connection_response(game.msqid, true, pid_client);
 
+    printf("Player %ld joined the game.\n", player_number);
+
     // Wait for client's messages
     pthread_t th_msg_move, th_msg_place_bomb;
     pthread_create(&th_msg_move, NULL, thread_player_message_move, (void*)player_number);
     pthread_create(&th_msg_place_bomb, NULL, thread_player_message_place_bomb, (void*)player_number);
     pthread_join(th_msg_move, NULL);
     pthread_join(th_msg_place_bomb, NULL);
+
+    pthread_exit(0);
 }
 
 
 
 void* thread_game(void* arg)
 {
+    printf("\nGame has started!\n\n");
 
+    while (true) {
+        // Send the game state to all clients
+        for (int i = 0; i < game.player_count; i++) {
+            int client_msqid = get_client_msqid(game.players[i].pid_client);
+            send_game_state(client_msqid, game);
+        }
+
+        sleep(5);
+    }
+
+    pthread_exit(0);
 }
 
 
@@ -104,7 +119,7 @@ bool create_player(pid_t pid_client)
         return false;
 
     // Initialize the player
-    game.players[game.player_count] = (struct player) {
+    game.players[game.player_count] = (struct player){
         .pid_client = pid_client,
         .coords = {0, 0},
         .alive = true,
@@ -143,7 +158,7 @@ void* thread_main_message_queue(void* arg)
         if (game.player_count < MAX_PLAYERS) {
             bool created = create_player(pid_client);
             send_connection_response(game.msqid, created, pid_client);
-            
+
             // If the players is now full, unlock the mutex to start the game
             if (game.player_count == MAX_PLAYERS)
                 pthread_mutex_unlock(&mut_start_game);
@@ -151,6 +166,8 @@ void* thread_main_message_queue(void* arg)
         else
             send_connection_response(game.msqid, false, pid_client);
     }
+
+    pthread_exit(0);
 }
 
 
@@ -161,14 +178,16 @@ void* thread_player_message_move(void* arg)
 
     // Retrieve client message queue ID
     int client_msqid = get_client_msqid(game.players[player_number].pid_client);
-    
+
     struct message_client_move msg_move;
     while (true) {
         // Receive move message
         msgrcv(client_msqid, &msg_move, sizeof(msg_move.mcontent), MESSAGE_CLIENT_MOVE_TYPE, 0);
-        
+
         // TODO
     }
+
+    pthread_exit(0);
 }
 
 
@@ -179,12 +198,14 @@ void* thread_player_message_place_bomb(void* arg)
 
     // Retrieve client message queue ID
     int client_msqid = get_client_msqid(game.players[player_number].pid_client);
-    
+
     struct message_client_place_bomb msg_place_bomb;
     while (true) {
         // Receive move message
         msgrcv(client_msqid, &msg_place_bomb, 0, MESSAGE_CLIENT_PLACE_BOMB_TYPE, 0);
-        
+
         // TODO
     }
+
+    pthread_exit(0);
 }

@@ -41,7 +41,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    printf("Connected.\n");
+    printf("Connected!\n");
 
     // Retrieve the client's message queue ID
     client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);
@@ -66,8 +66,10 @@ void* thread_message_game_state(void* arg)
         msgrcv(client_msqid, &msg_game_state, sizeof(msg_game_state.mcontent), MESSAGE_SERVER_GAME_STATE_TYPE, 0);
         
         // Display game state
-        // TODO
+        printf("Received game state.\n");
     }
+
+    pthread_exit(0);
 }
 
 
@@ -80,4 +82,6 @@ void* thread_message_game_end(void* arg)
     msgrcv(client_msqid, &msg_game_end, sizeof(msg_game_end.mcontent), MESSAGE_SERVER_GAME_END_TYPE, 0);
     
     // TODO
+
+    pthread_exit(0);
 }
