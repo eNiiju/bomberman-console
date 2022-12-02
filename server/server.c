@@ -95,6 +95,28 @@ void* thread_player(void* arg)
 
 void* thread_game(void* arg)
 {
+    // Retrieve map data
+    FILE* map_file = fopen(strcat(PATH_MAPS, "bbtty_default"), "r");
+    if (map_file == NULL) {
+        perror("Error while opening map file");
+        pthread_exit(1);
+    }
+
+    int line = 0, column = 0;
+    char c;
+
+    do {
+        c = fgetc(map_file);
+        
+        if (c == '\n') {
+            line++;
+            continue;
+        }
+
+        game.map[line][column] = c;
+    } while (c != EOF);
+
+
     printf("\nGame has started!\n\n");
 
     while (true) {

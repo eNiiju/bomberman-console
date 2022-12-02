@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 #define TOKEN_PATH_NAME "/etc/passwd"
+#define PATH_MAPS "../assets/maps/"
 
 #define MESSAGE_CLIENT_CONNECTION_TYPE 1
 #define MESSAGE_CLIENT_DISCONNECTION_TYPE 2
