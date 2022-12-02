@@ -26,6 +26,8 @@
 */
 int create_message_queue(int game_code);
 
+int get_client_msqid(int pid_client);
+
 /**
  * Send a response to the client regarding it's connection request.
  * @param main_msqid The main message queue ID

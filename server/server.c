@@ -81,14 +81,18 @@ void* thread_player(void* arg)
     send_connection_response(game.msqid, true, pid_client);
 
     // Wait for client's messages
-    // TODO
+    pthread_t th_msg_move, th_msg_place_bomb;
+    pthread_create(&th_msg_move, NULL, thread_player_message_move, (void*)player_number);
+    pthread_create(&th_msg_place_bomb, NULL, thread_player_message_place_bomb, (void*)player_number);
+    pthread_join(th_msg_move, NULL);
+    pthread_join(th_msg_place_bomb, NULL);
 }
 
 
 
 void* thread_game(void* arg)
 {
-    
+
 }
 
 
@@ -146,5 +150,41 @@ void* thread_main_message_queue(void* arg)
         }
         else
             send_connection_response(game.msqid, false, pid_client);
+    }
+}
+
+
+
+void* thread_player_message_move(void* arg)
+{
+    long player_number = (long)arg;
+
+    // Retrieve client message queue ID
+    int client_msqid = get_client_msqid(game.players[player_number].pid_client);
+    
+    struct message_client_move msg_move;
+    while (true) {
+        // Receive move message
+        msgrcv(client_msqid, &msg_move, sizeof(msg_move.mcontent), MESSAGE_CLIENT_MOVE_TYPE, 0);
+        
+        // TODO
+    }
+}
+
+
+
+void* thread_player_message_place_bomb(void* arg)
+{
+    long player_number = (long)arg;
+
+    // Retrieve client message queue ID
+    int client_msqid = get_client_msqid(game.players[player_number].pid_client);
+    
+    struct message_client_place_bomb msg_place_bomb;
+    while (true) {
+        // Receive move message
+        msgrcv(client_msqid, &msg_place_bomb, 0, MESSAGE_CLIENT_PLACE_BOMB_TYPE, 0);
+        
+        // TODO
     }
 }

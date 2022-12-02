@@ -66,3 +66,7 @@ bool client_in_game(pid_t pid_client);
  * @param arg Unused.
 */
 void* thread_main_message_queue(void* arg);
+
+void* thread_player_message_move(void* arg);
+
+void* thread_player_message_place_bomb(void* arg);

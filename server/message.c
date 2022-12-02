@@ -17,6 +17,13 @@ int create_message_queue(int project_id)
 
 
 
+int get_client_msqid(int pid_client)
+{
+    return msgget(ftok(TOKEN_PATH_NAME, pid_client), 0);
+}
+
+
+
 bool send_connection_response(int main_msqid, bool success, pid_t pid_client)
 {
     struct message_server_response msg = {
