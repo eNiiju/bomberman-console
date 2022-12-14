@@ -88,7 +88,7 @@ void* thread_player(void* arg)
     pthread_join(th_msg_move, NULL);
     pthread_join(th_msg_place_bomb, NULL);
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }
 
 
@@ -99,7 +99,7 @@ void* thread_game(void* arg)
     FILE* map_file = fopen(strcat(PATH_MAPS, "bbtty_default"), "r");
     if (map_file == NULL) {
         perror("Error while opening map file");
-        pthread_exit(1);
+        pthread_exit(NULL);
     }
 
     int line = 0, column = 0;
@@ -129,7 +129,7 @@ void* thread_game(void* arg)
         sleep(5);
     }
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }
 
 
@@ -189,7 +189,7 @@ void* thread_main_message_queue(void* arg)
             send_connection_response(game.msqid, false, pid_client);
     }
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }
 
 
@@ -209,7 +209,7 @@ void* thread_player_message_move(void* arg)
         // TODO
     }
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }
 
 
@@ -229,5 +229,5 @@ void* thread_player_message_place_bomb(void* arg)
         // TODO
     }
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }

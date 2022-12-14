@@ -69,7 +69,7 @@ void* thread_message_game_state(void* arg)
         printf("Received game state.\n");
     }
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }
 
 
@@ -83,5 +83,5 @@ void* thread_message_game_end(void* arg)
     
     // TODO
 
-    pthread_exit(0);
+    pthread_exit(NULL);
 }

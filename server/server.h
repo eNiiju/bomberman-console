@@ -32,7 +32,7 @@ bool setup(void);
  * It is created as a thread once a player joins the game.
  * It is responsible for the communication between the server and the client,
  * including receiving player's inputs and take them into account for the game.
- * @param arg (short int) The player's number.
+ * @param arg (long) The player's number.
 */
 void* thread_player(void* arg);
 
@@ -67,6 +67,16 @@ bool client_in_game(pid_t pid_client);
 */
 void* thread_main_message_queue(void* arg);
 
+/**
+ * Function for the thread handling the "move" messages received
+ * from a client.
+ * @param arg (long) The player's number.
+*/
 void* thread_player_message_move(void* arg);
 
+/**
+ * Function for the thread handling the "place bomb" messages received
+ * from a client.
+ * @param arg (long) The player's number.
+*/
 void* thread_player_message_place_bomb(void* arg);

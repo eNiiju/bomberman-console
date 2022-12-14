@@ -14,6 +14,16 @@
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 
+/**
+ * Function for the thread that handles the "game state" messages
+ * received from the server.
+ * @param arg Unused.
+*/
 void* thread_message_game_state(void* arg);
 
+/**
+ * Function for the thread that handles the "game end" messages
+ * received from the server.
+ * @param arg Unused.
+*/
 void* thread_message_game_end(void* arg);

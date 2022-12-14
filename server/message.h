@@ -26,6 +26,11 @@
 */
 int create_message_queue(int game_code);
 
+/**
+ * Get the message queue ID of the client.
+ * @param pid_client The PID of the client
+ * @return The message queue ID if successful, -1 otherwise
+*/
 int get_client_msqid(int pid_client);
 
 /**
