@@ -96,7 +96,10 @@ void* thread_player(void* arg)
 void* thread_game(void* arg)
 {
     // Retrieve map data
-    FILE* map_file = fopen(strcat(PATH_MAPS, "bbtty_default"), "r");
+    char path_to_map[MAX_LENGTH_PATH_TO_MAP] = PATH_MAPS;
+    strcat(path_to_map, "bbtty_default");
+    FILE* map_file = fopen(path_to_map, "r");
+
     if (map_file == NULL) {
         perror("Error while opening map file");
         pthread_exit(NULL);
