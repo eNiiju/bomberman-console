@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <ncurses.h>
 
 #include "../include/definitions.h"
 #include "message.h"
@@ -13,6 +14,18 @@
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
+
+/**
+ * Function for the thread that displays the game state.
+ * @param arg Unused.
+*/
+void* thread_display(void* arg);
+
+/**
+ * Function for the thread that handles the user inputs.
+ * @param arg Unused.
+*/
+void* thread_inputs(void* arg);
 
 /**
  * Function for the thread that handles the "game state" messages

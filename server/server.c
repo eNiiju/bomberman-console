@@ -210,6 +210,7 @@ void* thread_player_message_move(void* arg)
         msgrcv(client_msqid, &msg_move, sizeof(msg_move.mcontent), MESSAGE_CLIENT_MOVE_TYPE, 0);
 
         // TODO
+        printf("Player %ld moved %d\n", player_number, msg_move.mcontent.direction);
     }
 
     pthread_exit(NULL);
@@ -230,6 +231,7 @@ void* thread_player_message_place_bomb(void* arg)
         msgrcv(client_msqid, &msg_place_bomb, 0, MESSAGE_CLIENT_PLACE_BOMB_TYPE, 0);
 
         // TODO
+        printf("Player %ld placed a bomb\n", player_number);
     }
 
     pthread_exit(NULL);
