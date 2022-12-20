@@ -99,18 +99,23 @@ void* thread_message_game_state(void* arg)
         // Receive game state message
         msgrcv(client_msqid, &msg_game_state, sizeof(msg_game_state.mcontent), MESSAGE_SERVER_GAME_STATE_TYPE, 0);
 
+        // Store the game state in the global variable
+        game = msg_game_state.mcontent.game_state;
+
         // If the game has not started yet, start the display thread
         if (!game_running) {
             game_running = true;
             printf("Game started!\n");
-            initscr(); // Initialise la structure WINDOW et autres paramètres de ncurses
+
+            // Initialize the ncurses window & disable echoing of typed characters
+            initscr(); 
+            noecho();
+
+            // Start threads that will handle the inputs & displaying the game state
             pthread_t th_display, th_inputs;
             pthread_create(&th_display, NULL, thread_display, NULL);
             pthread_create(&th_inputs, NULL, thread_inputs, NULL);
         }
-
-        // Store the game state in the global variable
-        game = msg_game_state.mcontent.game_state;
     }
 
     pthread_exit(NULL);
