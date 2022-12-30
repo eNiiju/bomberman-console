@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <ncurses.h>
 
 #include "../include/definitions.h"

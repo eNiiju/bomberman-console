@@ -107,29 +107,29 @@ void* thread_game(void* arg)
 
     int line = 0, column = 0;
     char c;
-
-    do {
-        c = fgetc(map_file);
-        
+    
+    while ((c = fgetc(map_file)) != EOF) {
         if (c == '\n') {
             line++;
-            continue;
+            column = 0;
+        } else {
+            game.map[line][column] = c;
+            column++;
         }
+    }
 
-        game.map[line][column] = c;
-    } while (c != EOF);
-
+    fclose(map_file);
 
     printf("\nGame has started!\n\n");
 
-    while (true) {
+    while (!game.ended) {
         // Send the game state to all clients
         for (int i = 0; i < game.player_count; i++) {
             int client_msqid = get_client_msqid(game.players[i].pid_client);
             send_game_state(client_msqid, game);
         }
 
-        sleep(5);
+        sleep(1);
     }
 
     pthread_exit(NULL);
@@ -175,7 +175,7 @@ bool client_in_game(pid_t pid_client)
 void* thread_main_message_queue(void* arg)
 {
     struct message_client_connection msg;
-    while (true) {
+    while (!game.ended) {
         // Receive a connection message from a client
         msgrcv(game.msqid, &msg, sizeof(msg.mcontent), MESSAGE_CLIENT_CONNECTION_TYPE, 0);
         pid_t pid_client = msg.mcontent.pid_client;
@@ -205,12 +205,12 @@ void* thread_player_message_move(void* arg)
     int client_msqid = get_client_msqid(game.players[player_number].pid_client);
 
     struct message_client_move msg_move;
-    while (true) {
+    while (!game.ended) {
         // Receive move message
         msgrcv(client_msqid, &msg_move, sizeof(msg_move.mcontent), MESSAGE_CLIENT_MOVE_TYPE, 0);
 
-        // TODO
-        printf("Player %ld moved %d\n", player_number, msg_move.mcontent.direction);
+        // Can the player move here?
+
     }
 
     pthread_exit(NULL);
@@ -226,7 +226,7 @@ void* thread_player_message_place_bomb(void* arg)
     int client_msqid = get_client_msqid(game.players[player_number].pid_client);
 
     struct message_client_place_bomb msg_place_bomb;
-    while (true) {
+    while (!game.ended) {
         // Receive move message
         msgrcv(client_msqid, &msg_place_bomb, 0, MESSAGE_CLIENT_PLACE_BOMB_TYPE, 0);
 

@@ -14,6 +14,7 @@ pid_t pid;
 int client_msqid;
 bool game_running = false;
 struct game game;
+sem_t sem_display;
 
 
 
@@ -63,8 +64,32 @@ int main(void)
 void* thread_display(void* arg)
 {
     while (game_running) {
-        // Display game state
-        // TODO : Display game state
+        // Wait for the game state to be received
+        sem_wait(&sem_display);
+        
+        // Clear the screen
+        clear();
+
+        // Display the map
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
+                switch (game.map[i][j]) {
+                case MAP_CASE_EMPTY: printw(" "); break;
+                case MAP_CASE_WALL: printw("#"); break;
+                case MAP_CASE_BREAKABLE_WALL: printw("."); break;
+                case MAP_CASE_BOMB: printw("o"); break;
+                case MAP_CASE_EXPLOSION: printw("x"); break;
+                case MAP_CASE_PLAYER_1: printw("1"); break;
+                case MAP_CASE_PLAYER_2: printw("2"); break;
+                case MAP_CASE_PLAYER_3: printw("3"); break;
+                case MAP_CASE_PLAYER_4: printw("4"); break;
+                default: break;
+                }
+            }
+            printw("\n");
+        }
+
+        refresh();
     }
 
     pthread_exit(NULL);
@@ -75,8 +100,10 @@ void* thread_display(void* arg)
 void* thread_inputs(void* arg)
 {
     while (game_running) {
+        // Get the input
         int c = getch();
 
+        // Send the input to the server if it is a valid one
         switch (c) {
         case _KEY_UP: send_message_move(client_msqid, DIRECTION_UP); break;
         case _KEY_DOWN: send_message_move(client_msqid, DIRECTION_DOWN); break;
@@ -95,12 +122,20 @@ void* thread_inputs(void* arg)
 void* thread_message_game_state(void* arg)
 {
     struct message_server_game_state msg_game_state;
-    while (true) {
+ 
+    // Initialize the semaphore used to display the game state
+    // Display thread is asked to display the map every time the game state is received
+    sem_init(&sem_display, 0, 0);
+
+    do {
         // Receive game state message
         msgrcv(client_msqid, &msg_game_state, sizeof(msg_game_state.mcontent), MESSAGE_SERVER_GAME_STATE_TYPE, 0);
 
         // Store the game state in the global variable
         game = msg_game_state.mcontent.game_state;
+
+        // Ask the display thread to display the game state
+        sem_post(&sem_display);
 
         // If the game has not started yet, start the display thread
         if (!game_running) {
@@ -116,7 +151,13 @@ void* thread_message_game_state(void* arg)
             pthread_create(&th_display, NULL, thread_display, NULL);
             pthread_create(&th_inputs, NULL, thread_inputs, NULL);
         }
-    }
+    } while (game_running);
+
+    // Game has ended, close the ncurses window
+    endwin();
+
+    // Destroy the display semaphore
+    sem_destroy(&sem_display);
 
     pthread_exit(NULL);
 }

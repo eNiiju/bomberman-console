@@ -30,11 +30,20 @@
 #define DIRECTION_RIGHT 4
 
 // Game default values & constants
-#define MAX_PLAYERS 1
+#define MAX_PLAYERS 1 // TODO change to 4
 #define DEFAULT_BOMB_RANGE 3
 #define BOMB_TIMER 3
 #define MAP_WIDTH 15
 #define MAP_HEIGHT 15
+#define MAP_CASE_EMPTY ' '
+#define MAP_CASE_WALL '#'
+#define MAP_CASE_BREAKABLE_WALL '.'
+#define MAP_CASE_BOMB 'o'
+#define MAP_CASE_EXPLOSION 'x'
+#define MAP_CASE_PLAYER_1 '1'
+#define MAP_CASE_PLAYER_2 '2'
+#define MAP_CASE_PLAYER_3 '3'
+#define MAP_CASE_PLAYER_4 '4'
 
 // Keys
 #define _KEY_UP 'z'
