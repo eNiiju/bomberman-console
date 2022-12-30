@@ -10,13 +10,10 @@
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
-struct game game = {
-    .ended = false,
-    .winner = -1,
-    .player_count = 0
-};
-
-pthread_mutex_t mut_start_game = PTHREAD_MUTEX_INITIALIZER;
+struct game game;
+pthread_mutex_t mut_start_game;
+pthread_mutex_t mut_player_move[MAX_PLAYERS];
+pthread_mutex_t mut_player_place_bomb[MAX_PLAYERS];
 
 
 
@@ -49,8 +46,22 @@ int main(void)
 
 bool setup(void)
 {
+    // Initialize mutexes
+    pthread_mutex_init(&mut_start_game, NULL);
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        pthread_mutex_init(&mut_player_move[i], NULL);
+        pthread_mutex_init(&mut_player_place_bomb[i], NULL);
+    }
+
     // Prevent the game from starting
     pthread_mutex_lock(&mut_start_game);
+
+    // Initialize game global variable
+    game = (struct game){
+        .ended = false,
+        .winner = -1,
+        .player_count = 0
+    };
 
     // Generate game code
     srand(time(NULL));
@@ -95,6 +106,7 @@ void* thread_player(void* arg)
 
 void* thread_game(void* arg)
 {
+    // TODO : Function to retrieve map data
     // Retrieve map data
     char path_to_map[MAX_LENGTH_PATH_TO_MAP] = PATH_MAPS;
     strcat(path_to_map, "bbtty_default");
@@ -105,18 +117,31 @@ void* thread_game(void* arg)
         pthread_exit(NULL);
     }
 
-    int line = 0, column = 0;
-    char c;
-    
-    while ((c = fgetc(map_file)) != EOF) {
-        if (c == '\n') {
-            line++;
-            column = 0;
-        } else {
-            game.map[line][column] = c;
-            column++;
-        }
+    // Retrieve all lines in the map file
+    char lines[MAP_HEIGHT][MAP_WIDTH + 2];
+    int i = 0;
+    while (fgets(lines[i], MAP_WIDTH + 2, map_file) != NULL) {
+        // Remove the newline character from the end of the string
+        size_t len = strlen(lines[i]);
+        if (len > 0 && lines[i][len - 1] == '\n')
+            lines[i][len - 1] = '\0';
+        i++;
     }
+
+    // Store the map data in the game structure
+    for (int line = 0; line < MAP_HEIGHT; line++) {
+        for (int column = 0; column < MAP_WIDTH; column++) {
+            char c = lines[line][column];
+            if (c == '1' || c == '2' || c == '3' || c == '4') {
+                // If it's a player, set it's coordinates and set the case to empty
+                // (will be replaced by the player on the client display)
+                game.players[c - '1'].coords = (struct coordinates){column, line};
+                game.map[line][column] = MAP_CASE_EMPTY;
+            }
+            else
+                game.map[line][column] = c;
+        }
+    }    
 
     fclose(map_file);
 
@@ -129,8 +154,10 @@ void* thread_game(void* arg)
             send_game_state(client_msqid, game);
         }
 
-        sleep(1);
+        usleep(REFRESH_RATE_MS * 1000);
     }
+
+    printf("\nGame has ended.\n");
 
     pthread_exit(NULL);
 }
@@ -148,7 +175,6 @@ bool create_player(pid_t pid_client)
         .pid_client = pid_client,
         .coords = {0, 0},
         .alive = true,
-        .bomb_amount = 1,
         .bomb_range = DEFAULT_BOMB_RANGE
     };
 
@@ -210,7 +236,11 @@ void* thread_player_message_move(void* arg)
         msgrcv(client_msqid, &msg_move, sizeof(msg_move.mcontent), MESSAGE_CLIENT_MOVE_TYPE, 0);
 
         // Can the player move here?
+        bool can_move = player_can_move(player_number, msg_move.mcontent.direction);
 
+        // Actually move the player
+        if (can_move)
+            move_player(player_number, msg_move.mcontent.direction);
     }
 
     pthread_exit(NULL);
@@ -230,9 +260,88 @@ void* thread_player_message_place_bomb(void* arg)
         // Receive move message
         msgrcv(client_msqid, &msg_place_bomb, 0, MESSAGE_CLIENT_PLACE_BOMB_TYPE, 0);
 
-        // TODO
-        printf("Player %ld placed a bomb\n", player_number);
+        // Can the player place a bomb?
+        bool can_place_bomb = player_can_place_bomb(player_number);
+
+        // Actually place the bomb
+        if (can_place_bomb)
+            place_bomb(player_number);
     }
 
     pthread_exit(NULL);
+}
+
+
+
+bool player_can_move(long player_number, int direction)
+{
+    return true;
+}
+
+
+
+bool player_can_place_bomb(long player_number)
+{
+    return true;
+}
+
+
+
+void* thread_wait_player_move_cooldown(void* arg)
+{
+    long player_number = (long)arg;
+
+    // Wait for the cooldown to end
+    usleep(PLAYER_MOVE_COOLDOWN_MS * 1000);
+
+    // Unlock the mutex for that player
+    pthread_mutex_unlock(&mut_player_move[player_number]);
+
+    pthread_exit(NULL);
+}
+
+
+
+void move_player(long player_number, int direction)
+{
+    // Lock the mutex for that player
+    pthread_mutex_lock(&mut_player_move[player_number]);
+
+    // Move the player on the map
+    switch (direction) {
+        case DIRECTION_UP:
+            game.players[player_number].coords.y--;
+            break;
+        case DIRECTION_DOWN:
+            game.players[player_number].coords.y++;
+            break;
+        case DIRECTION_LEFT:
+            game.players[player_number].coords.x--;
+            break;
+        case DIRECTION_RIGHT:
+            game.players[player_number].coords.x++;
+            break;
+    }
+
+    // Create a thread to wait for the cooldown to end
+    pthread_t th_wait_cooldown;
+    pthread_create(&th_wait_cooldown, NULL, thread_wait_player_move_cooldown, (void*)player_number);
+}
+
+
+
+void place_bomb(long player_number)
+{
+    // Lock the mutex for that player
+    pthread_mutex_lock(&mut_player_place_bomb[player_number]);
+
+    // Retrieve the player's coordinates
+    int x = game.players[player_number].coords.x;
+    int y = game.players[player_number].coords.y;
+
+    // Place the bomb
+    game.map[y][x] = MAP_CASE_BOMB;
+    
+    // Create a thread to wait for the bomb to explode
+    // TODO : unlock bomb mutex in thread after cooldown
 }

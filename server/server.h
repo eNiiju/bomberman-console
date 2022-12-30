@@ -79,3 +79,40 @@ void* thread_player_message_move(void* arg);
  * @param arg (long) The player's number.
 */
 void* thread_player_message_place_bomb(void* arg);
+
+/**
+ * Returns if a player can move in a given direction, in the current
+ * game state in the global variable "game".
+ * @param player_number The player's number.
+ * @param direction The direction the player wants to move in.
+*/
+bool player_can_move(long player_number, int direction);
+
+/**
+ * Returns if a player can place a bomb in the current game state in the
+ * global variable "game".
+ * @param player_number The player's number.
+*/
+bool player_can_place_bomb(long player_number);
+
+/**
+ * Thread waiting for the player's move cooldown to end,
+ * then ends.
+ * @param arg (long) The player's number.
+*/
+void* thread_wait_player_move_cooldown(void* arg);
+
+/**
+ * Moves the player in the given direction, when the player has 
+ * no active cooldown.
+ * @param player_number The player's number.
+ * @param direction The direction the player will be moved
+*/
+void move_player(long player_number, int direction);
+
+/**
+ * Places a bomb in the player's position, then starts a thread
+ * that will make the bomb explode after the defined time.
+ * @param player_number The player's number.
+*/
+void place_bomb(long player_number);

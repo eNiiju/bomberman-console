@@ -67,26 +67,36 @@ void* thread_display(void* arg)
         // Wait for the game state to be received
         sem_wait(&sem_display);
         
-        // Clear the screen
         clear();
 
         // Display the map
         for (int i = 0; i < MAP_HEIGHT; i++) {
-            for (int j = 0; j < MAP_WIDTH; j++) {
-                switch (game.map[i][j]) {
-                case MAP_CASE_EMPTY: printw(" "); break;
-                case MAP_CASE_WALL: printw("#"); break;
-                case MAP_CASE_BREAKABLE_WALL: printw("."); break;
-                case MAP_CASE_BOMB: printw("o"); break;
-                case MAP_CASE_EXPLOSION: printw("x"); break;
-                case MAP_CASE_PLAYER_1: printw("1"); break;
-                case MAP_CASE_PLAYER_2: printw("2"); break;
-                case MAP_CASE_PLAYER_3: printw("3"); break;
-                case MAP_CASE_PLAYER_4: printw("4"); break;
-                default: break;
+            for (int n = 0; n < 2; n++) { // Print 2 times each line
+                for (int j = 0; j < MAP_WIDTH; j++) {
+                    switch (game.map[j][i]) {
+                    case MAP_CASE_WALL: printw("####"); break;
+                    case MAP_CASE_BREAKABLE_WALL: printw("////"); break;
+                    case MAP_CASE_BOMB: printw(" oo "); break;
+                    case MAP_CASE_EXPLOSION: printw("xxxx"); break;
+                    case MAP_CASE_EMPTY: printw("    "); break;
+                    }
                 }
+                
+                move(i * 2 + n + 1, 0);
             }
-            printw("\n");
+        }
+
+        // Display players
+        int x, y;
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+            x = game.players[i].coords.x;
+            y = game.players[i].coords.y;
+            move(y * 2, x * 4);
+            for (int n = 0; n < 4; n++)
+                addch((char)(i + 1 + 48));
+            move(y * 2 + 1, x * 4);
+            for (int n = 0; n < 4; n++)
+                addch((char)(i + 1 + 48));
         }
 
         refresh();
