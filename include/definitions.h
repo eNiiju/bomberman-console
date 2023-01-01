@@ -40,12 +40,16 @@
 #define BOMB_EXPLOSION_TIMER_MS 3000
 #define PLAYER_MOVE_COOLDOWN_MS  100
 #define BOMB_FIRE_TIME_MS       2000
-#define REFRESH_RATE_MS          100
+#define REFRESH_DELAY_MS         100
 
 // Map tiles
+#define MAP_TILE_SIZE_X           4
+#define MAP_TILE_SIZE_Y           2
 #define MAP_TILE_EMPTY          ' '
 #define MAP_TILE_WALL           '#'
 #define MAP_TILE_BREAKABLE_WALL '/'
+#define MAP_TILE_BOMB           'o'
+#define MAP_TILE_EXPLOSION      'x'
 
 // Player control keys
 #define CONTROL_KEY_UP         'z'

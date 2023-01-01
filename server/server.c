@@ -123,7 +123,7 @@ void* thread_game(void* arg)
             send_game_state(client_msqid, game);
         }
 
-        usleep(REFRESH_RATE_MS * 1000);
+        usleep(REFRESH_DELAY_MS * 1000);
 
         check_game_end();
     }

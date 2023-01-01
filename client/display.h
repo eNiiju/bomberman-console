@@ -32,3 +32,11 @@ void display_bombs(struct game* game);
  * @param game The game state
 */
 void display_players(struct game* game);
+
+/**
+ * Prints a tile on the ncurses window.
+ * @param x The x coordinate of the tile
+ * @param y The y coordinate of the tile
+ * @param c The character to print
+*/
+void print_tile(int x, int y, char c);
