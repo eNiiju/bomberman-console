@@ -470,7 +470,59 @@ void* thread_place_bomb(void* arg)
 
 bool check_player_death(int player_number)
 {
-    // TODO : Check if the player is dead
+    int player_x = game.players[player_number].coords.x;
+    int player_y = game.players[player_number].coords.y;
+
+    // For each bomb on the map
+    for (int i = 0; i < game.player_count; i++) {
+
+        if (game.players[i].bomb.active && game.players[i].bomb.exploded) {
+            int bomb_x = game.players[i].bomb.coords.x;
+            int bomb_y = game.players[i].bomb.coords.y;
+
+            // Check if the player is on the bomb's explosion
+            if (player_x == bomb_x && player_y == bomb_y)
+                return true;
+
+            // Check if the player is on the bomb's explosion's range
+            int next_x, next_y;
+            int up = 1, down = 1, left = 1, right = 1;
+            for (int j = 1; j <= game.players[i].bomb.range; j++) {
+                // Up
+                next_x = bomb_x; next_y = bomb_y - j;
+                if (up == j && next_y >= 0 && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    if (player_x == next_x && player_y == next_y)
+                        return true;
+                    up++;
+                }
+
+                // Down
+                next_x = bomb_x; next_y = bomb_y + j;
+                if (down == j && next_y < MAP_HEIGHT && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    if (player_x == next_x && player_y == next_y)
+                        return true;
+                    down++;
+                }
+
+                // Left
+                next_x = bomb_x - j; next_y = bomb_y;
+                if (left == j && next_x >= 0 && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    if (player_x == next_x && player_y == next_y)
+                        return true;
+                    left++;
+                }
+
+                // Right
+                next_x = bomb_x + j; next_y = bomb_y;
+                if (right == j && next_x < MAP_WIDTH && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    if (player_x == next_x && player_y == next_y)
+                        return true;
+                    right++;
+                }
+            }
+        }
+    }
+
     return false;
 }
 
