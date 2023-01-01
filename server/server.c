@@ -12,6 +12,7 @@
 
 struct game game;
 pthread_mutex_t mut_start_game;
+pthread_mutex_t mut_create_player; // Prevents multiple players from being created with the same number
 
 
 
@@ -46,6 +47,7 @@ bool setup(void)
 {
     // Initialize mutexes
     pthread_mutex_init(&mut_start_game, NULL);
+    pthread_mutex_init(&mut_create_player, NULL);
 
     // Prevent the game from starting
     pthread_mutex_lock(&mut_start_game);
@@ -74,7 +76,9 @@ bool setup(void)
 
 void* thread_player(void* arg)
 {
-    int player_number = *(int*)arg;
+    int player_number = game.player_count++;
+    pthread_mutex_unlock(&mut_create_player);
+
     pid_t pid_client = game.players[player_number].pid_client;
     pthread_t th_msg_move, th_msg_place_bomb;
 
@@ -163,11 +167,13 @@ void retrieve_map_data(const char* map_name)
 
 bool create_player(pid_t pid_client)
 {
-    pthread_t thplayer;
+    pthread_t th_player;
 
     // If the player already exists, do nothing
     if (client_in_game(pid_client))
         return false;
+
+    pthread_mutex_lock(&mut_create_player);
 
     // Initialize the player
     game.players[game.player_count] = (struct player){
@@ -178,8 +184,7 @@ bool create_player(pid_t pid_client)
     };
 
     // Create the player thread
-    pthread_create(&thplayer, NULL, thread_player, (void*)&game.player_count);
-    game.player_count++;
+    pthread_create(&th_player, NULL, thread_player, NULL);
 
     return true;
 }

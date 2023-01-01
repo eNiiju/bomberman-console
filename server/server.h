@@ -31,7 +31,7 @@ bool setup(void);
  * It is created as a thread once a player joins the game.
  * It is responsible for the communication between the server and the client,
  * including receiving player's inputs and take them into account for the game.
- * @param arg (int*) The player's number.
+ * @param arg Unused
 */
 void* thread_player(void* arg);
 
