@@ -83,8 +83,10 @@ bool setup(char* path_to_map_file)
     }
     strcpy(game.path_to_map_file, path_to_map_file);
 
-    if (game.msqid == -1)
-        perror("Error while creating message queue.\n");
+    if (game.msqid == -1) {
+        perror("Error while creating message queue");
+        return false;
+    }
 
     return true;
 }
@@ -412,8 +414,43 @@ void* thread_place_bomb(void* arg)
     // Apply the explosion to the map
     game.players[player_number].bomb.exploded = true;
 
-    // TODO: Remove breakable walls that have been destroyed by the explosion
+    // Remove breakable walls that have been destroyed by the explosion
+    int next_x, next_y;
+    int up = 1, down = 1, left = 1, right = 1;
 
+    for (int j = 1; j <= game.players[player_number].bomb.range; j++) {
+        // Up
+        next_x = x; next_y = y - j;
+        if (up == j && next_y >= 0 && game.map[next_y][next_x] != MAP_TILE_WALL) {
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+                game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            else up++;
+        }
+
+        // Down
+        next_x = x; next_y = y + j;
+        if (down == j && next_y < MAP_HEIGHT && game.map[next_y][next_x] != MAP_TILE_WALL) {
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+                game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            else down++;
+        }
+
+        // Left
+        next_x = x - j; next_y = y;
+        if (left == j && next_x >= 0 && game.map[next_y][next_x] != MAP_TILE_WALL) {
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+                game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            else left++;
+        }
+
+        // Right
+        next_x = x + j; next_y = y;
+        if (right == j && next_x < MAP_WIDTH && game.map[next_y][next_x] != MAP_TILE_WALL) {
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+                game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            else right++;
+        }
+    }
 
     // Check if the bomb killed a player
     for (int i = 0; i < game.player_count; i++)

@@ -30,37 +30,37 @@ void display_bombs(struct game* game)
 
         if (game->players[i].bomb.exploded) {
             // Display the explosion fire
-            int new_x, new_y;
+            int next_x, next_y;
             int up = 1, down = 1, left = 1, right = 1;
 
             print_tile(x, y, MAP_TILE_EXPLOSION);
 
             for (int j = 1; j <= game->players[i].bomb.range; j++) {
                 // Up
-                new_x = x; new_y = y - j;
-                if (up == j && new_y >= 0 && game->map[new_y][new_x] == MAP_TILE_EMPTY) {
-                    print_tile(new_x, new_y, MAP_TILE_EXPLOSION);
+                next_x = x; next_y = y - j;
+                if (up == j && next_y >= 0 && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     up++;
                 }
 
                 // Down
-                new_x = x; new_y = y + j;
-                if (down == j && new_y < MAP_HEIGHT && game->map[new_y][new_x] == MAP_TILE_EMPTY) {
-                    print_tile(new_x, new_y, MAP_TILE_EXPLOSION);
+                next_x = x; next_y = y + j;
+                if (down == j && next_y < MAP_HEIGHT && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     down++;
                 }
 
                 // Left
-                new_x = x - j; new_y = y;
-                if (left == j && new_x >= 0 && game->map[new_y][new_x] == MAP_TILE_EMPTY) {
-                    print_tile(new_x, new_y, MAP_TILE_EXPLOSION);
+                next_x = x - j; next_y = y;
+                if (left == j && next_x >= 0 && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     left++;
                 }
 
                 // Right
-                new_x = x + j; new_y = y;
-                if (right == j && new_x < MAP_WIDTH && game->map[new_y][new_x] == MAP_TILE_EMPTY) {
-                    print_tile(new_x, new_y, MAP_TILE_EXPLOSION);
+                next_x = x + j; next_y = y;
+                if (right == j && next_x < MAP_WIDTH && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                    print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     right++;
                 }
             }
