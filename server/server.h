@@ -28,6 +28,12 @@
 bool setup(char* path_to_map_file);
 
 /**
+ * Cleans up the server before exiting the program.
+ * @return true if successful, false otherwise
+*/
+bool clean_exit();
+
+/**
  * Function handling players' actions.
  * It is created as a thread once a player joins the game.
  * It is responsible for the communication between the server and the client,

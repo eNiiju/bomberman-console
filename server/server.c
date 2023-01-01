@@ -44,6 +44,13 @@ int main(int argc, char* argv[])
     pthread_create(&th_game, NULL, thread_game, NULL);
     pthread_join(th_game, NULL);
 
+    // Game ended, clean up
+    if (!clean_exit()) {
+        printf("Clean exit failed.\n");
+        return EXIT_FAILURE;
+    }
+    printf("Server is shutting down clean.\n");
+
     return 0;
 }
 
@@ -78,6 +85,23 @@ bool setup(char* path_to_map_file)
 
     if (game.msqid == -1)
         perror("Error while creating message queue.\n");
+
+    return true;
+}
+
+
+bool clean_exit()
+{
+    // Delete the main message queue
+    msgctl(game.msqid, IPC_RMID, NULL);
+
+    // Delete all players' message queues
+    for (int i = 0; i < game.player_count; i++)
+        msgctl(get_client_msqid(game.players[i].pid_client), IPC_RMID, NULL);
+
+    // Destroy mutexes
+    pthread_mutex_destroy(&mut_start_game);
+    pthread_mutex_destroy(&mut_create_player);
 
     return true;
 }
