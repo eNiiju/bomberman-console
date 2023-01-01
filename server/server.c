@@ -98,7 +98,7 @@ bool clean_exit()
     msgctl(game.msqid, IPC_RMID, NULL);
 
     // Delete all players' message queues
-    for (int i = 0; i < game.player_count; i++)
+    for (int i = 0; i < MAX_PLAYERS; i++)
         msgctl(get_client_msqid(game.players[i].pid_client), IPC_RMID, NULL);
 
     // Destroy mutexes
@@ -144,7 +144,7 @@ void* thread_game(void* arg)
 
     while (!game.ended) {
         // Send the game state to all clients
-        for (int i = 0; i < game.player_count; i++) {
+        for (int i = 0; i < MAX_PLAYERS; i++) {
             int client_msqid = get_client_msqid(game.players[i].pid_client);
             send_game_state(client_msqid, game);
         }
@@ -333,7 +333,7 @@ bool player_can_move(int player_number, int direction)
     }
 
     // Check if there is a player on this case
-    for (int i = 0; i < game.player_count; i++)
+    for (int i = 0; i < MAX_PLAYERS; i++)
         if (i != player_number
             && game.players[i].alive
             && game.players[i].coords.x == coords.x
@@ -384,8 +384,10 @@ void* thread_move_player(void* arg)
     }
 
     // Check if the player died by moving on a bomb's explosion
-    if (check_player_death(player_number))
+    if (check_player_death(player_number)) {
         game.players[player_number].alive = false;
+        game.player_count--;
+    }
 
     pthread_exit(NULL);
 }
@@ -453,9 +455,11 @@ void* thread_place_bomb(void* arg)
     }
 
     // Check if the bomb killed a player
-    for (int i = 0; i < game.player_count; i++)
-        if (check_player_death(i))
+    for (int i = 0; i < MAX_PLAYERS; i++)
+        if (game.players[i].alive && check_player_death(i)) {
             game.players[i].alive = false;
+            game.player_count--;
+        }
 
     // Wait a bit
     usleep(BOMB_FIRE_TIME_MS * 1000);
@@ -474,9 +478,8 @@ bool check_player_death(int player_number)
     int player_y = game.players[player_number].coords.y;
 
     // For each bomb on the map
-    for (int i = 0; i < game.player_count; i++) {
-
-        if (game.players[i].bomb.active && game.players[i].bomb.exploded) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
+        if (game.players[i].alive && game.players[i].bomb.active && game.players[i].bomb.exploded) {
             int bomb_x = game.players[i].bomb.coords.x;
             int bomb_y = game.players[i].bomb.coords.y;
 
@@ -530,5 +533,17 @@ bool check_player_death(int player_number)
 
 void check_game_end(void)
 {
-    // TODO : Check if the game is over
+    if (game.player_count > 1)
+        return;
+
+    // Find the last player alive (the winner)
+    int winner = 0;
+    while (!game.players[winner].alive)
+        winner++;
+
+    game.ended = true;
+
+    // Send the winner to the clients
+    for (int i = 0; i < MAX_PLAYERS; i++)
+        send_game_end(get_client_msqid(game.players[i].pid_client), winner);
 }

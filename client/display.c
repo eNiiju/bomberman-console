@@ -21,7 +21,7 @@ void display_map(struct game* game)
 
 void display_bombs(struct game* game)
 {
-    for (int i = 0; i < game->player_count; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         if (!game->players[i].alive || !game->players[i].bomb.active)
             continue;
 
@@ -74,7 +74,7 @@ void display_bombs(struct game* game)
 
 void display_players(struct game* game)
 {
-    for (int i = 0; i < game->player_count; i++) {
+    for (int i = 0; i < MAX_PLAYERS; i++) {
         if (!game->players[i].alive)
             continue;
 

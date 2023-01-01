@@ -34,7 +34,7 @@
 
 // Game default values & constants
 #define MAX_PLAYERS                2 // TODO: Change to 4
-#define DEFAULT_BOMB_RANGE         3
+#define DEFAULT_BOMB_RANGE         2
 #define MAP_WIDTH                 15
 #define MAP_HEIGHT                15
 #define BOMB_EXPLOSION_TIMER_MS 3000
