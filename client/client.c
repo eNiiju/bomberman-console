@@ -75,7 +75,7 @@ void* thread_display(void* arg)
         for (int i = 0; i < MAP_HEIGHT; i++) {
             for (int n = 0; n < 2; n++) { // Print 2 times each line
                 for (int j = 0; j < MAP_WIDTH; j++) {
-                    switch (game.map[j][i]) {
+                    switch (game.map[i][j]) {
                     case MAP_TILE_WALL:           printw("####"); break;
                     case MAP_TILE_BREAKABLE_WALL: printw("////"); break;
                     case MAP_TILE_EMPTY:          printw("    "); break;

@@ -69,10 +69,15 @@ bool setup(char* path_to_map_file)
         .player_count = 0
     };
     game.msqid = create_message_queue(game.game_code);
+
+    if (strlen(path_to_map_file) > MAX_LENGTH_PATH_TO_MAP) {
+        printf("Path to map file is too long. (Should be under %d characters)\n", MAX_LENGTH_PATH_TO_MAP);
+        return false;
+    }
     strcpy(game.path_to_map_file, path_to_map_file);
 
     if (game.msqid == -1) {
-        perror("Error while creating message queue");
+        printf("Error while creating message queue.\n");
         return false;
     }
 
