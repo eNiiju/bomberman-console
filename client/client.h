@@ -11,6 +11,7 @@
 
 #include "../include/definitions.h"
 #include "message.h"
+#include "display.h"
 
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */

@@ -76,10 +76,8 @@ bool setup(char* path_to_map_file)
     }
     strcpy(game.path_to_map_file, path_to_map_file);
 
-    if (game.msqid == -1) {
-        printf("Error while creating message queue.\n");
-        return false;
-    }
+    if (game.msqid == -1)
+        perror("Error while creating message queue.\n");
 
     return true;
 }
