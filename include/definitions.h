@@ -47,8 +47,6 @@
 #define MAP_TILE_EMPTY          ' '
 #define MAP_TILE_WALL           '#'
 #define MAP_TILE_BREAKABLE_WALL '/'
-#define MAP_TILE_BOMB           'o'
-#define MAP_TILE_EXPLOSION      'x'
 
 // Player control keys
 #define CONTROL_KEY_UP         'z'

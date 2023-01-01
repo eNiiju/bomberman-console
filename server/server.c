@@ -284,14 +284,50 @@ void* thread_player_message_place_bomb(void* arg)
 bool player_can_move(int player_number, int direction)
 {
     // TODO : reject if the player doesnt have its cooldown
-    return true;
+
+    // Get the player coordinates
+    struct coordinates coords = game.players[player_number].coords;
+
+    // Get the coordinates of the case the player wants to move to
+    switch (direction) {
+    case DIRECTION_UP:    coords.y--; break;
+    case DIRECTION_DOWN:  coords.y++; break;
+    case DIRECTION_LEFT:  coords.x--; break;
+    case DIRECTION_RIGHT: coords.x++; break;
+    }
+
+    // Check if there is a player on this case
+    for (int i = 0; i < game.player_count; i++)
+        if (i != player_number
+            && game.players[i].alive
+            && game.players[i].coords.x == coords.x
+            && game.players[i].coords.y == coords.y)
+            return false;
+
+    // Check if there is a planted bomb on this case
+    for (int i = 0; i < game.player_count; i++)
+        if (game.players[i].bomb.active
+            && !game.players[i].bomb.exploded
+            && game.players[i].bomb.coords.x == coords.x
+            && game.players[i].bomb.coords.y == coords.y)
+            return false;
+
+    // Check if the player can move to this case
+    switch (game.map[coords.y][coords.x]) {
+    case MAP_TILE_EMPTY:          return true;
+    case MAP_TILE_WALL:           return false;
+    case MAP_TILE_BREAKABLE_WALL: return false;
+    default:                      return false;
+    }
 }
 
 
 
 bool player_can_place_bomb(int player_number)
 {
-    // TODO : reject if the player has already placed a bomb
+    // If the player already has a bomb on the map, he can't plant another one
+    if (game.players[player_number].bomb.active)
+        return false;
     return true;
 }
 
