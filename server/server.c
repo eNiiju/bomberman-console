@@ -20,11 +20,17 @@ pthread_mutex_t mut_create_player; // Prevents multiple players from being creat
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-int main(void)
+int main(int argc, char* argv[])
 {
     pthread_t th_main_msq, th_game;
 
-    if (!setup()) {
+    // Check if the map file is provided
+    if (argc < 2) {
+        printf("Usage: %s <path_to_map_file>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    if (!setup(argv[1])) {
         printf("Server setup failed.\n");
         return EXIT_FAILURE;
     }
@@ -43,7 +49,7 @@ int main(void)
 
 
 
-bool setup(void)
+bool setup(char* path_to_map_file)
 {
     // Initialize mutexes
     pthread_mutex_init(&mut_start_game, NULL);
@@ -60,9 +66,10 @@ bool setup(void)
         .game_code = rand() % 10000,
         .ended = false,
         .winner = -1,
-        .player_count = 0,
+        .player_count = 0
     };
     game.msqid = create_message_queue(game.game_code);
+    strcpy(game.path_to_map_file, path_to_map_file);
 
     if (game.msqid == -1) {
         perror("Error while creating message queue");
@@ -102,7 +109,7 @@ void* thread_player(void* arg)
 
 void* thread_game(void* arg)
 {
-    retrieve_map_data("bbtty_default");
+    retrieve_map_data(game.path_to_map_file);
 
     printf("\nGame has started!\n\n");
 
@@ -114,6 +121,8 @@ void* thread_game(void* arg)
         }
 
         usleep(REFRESH_RATE_MS * 1000);
+
+        check_game_end();
     }
 
     printf("\nGame has ended.\n");
@@ -123,11 +132,9 @@ void* thread_game(void* arg)
 
 
 
-void retrieve_map_data(const char* map_name)
+void retrieve_map_data(char* path_to_map_file)
 {
-    char path_to_map[MAX_LENGTH_PATH_TO_MAP] = PATH_MAPS;
-    strcat(path_to_map, map_name);
-    FILE* map_file = fopen(path_to_map, "r");
+    FILE* map_file = fopen(path_to_map_file, "r");
 
     if (map_file == NULL) {
         perror("Error while opening map file");
@@ -347,6 +354,10 @@ void* thread_move_player(void* arg)
     case DIRECTION_RIGHT: game.players[player_number].coords.x++; break;
     }
 
+    // Check if the player died by moving on a bomb's explosion
+    if (check_player_death(player_number))
+        game.players[player_number].alive = false;
+
     pthread_exit(NULL);
 }
 
@@ -374,6 +385,14 @@ void* thread_place_bomb(void* arg)
     // Apply the explosion to the map
     game.players[player_number].bomb.exploded = true;
 
+    // TODO: Remove breakable walls that have been destroyed by the explosion
+
+
+    // Check if the bomb killed a player
+    for (int i = 0; i < game.player_count; i++)
+        if (check_player_death(i))
+            game.players[i].alive = false;
+
     // Wait a bit
     usleep(BOMB_FIRE_TIME_MS * 1000);
 
@@ -381,4 +400,19 @@ void* thread_place_bomb(void* arg)
     game.players[player_number].bomb.active = false;
 
     pthread_exit(NULL);
+}
+
+
+
+bool check_player_death(int player_number)
+{
+    // TODO : Check if the player is dead
+    return false;
+}
+
+
+
+void check_game_end(void)
+{
+    // TODO : Check if the game is over
 }

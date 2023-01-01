@@ -69,7 +69,7 @@ void* thread_display(void* arg)
         // Wait for the game state to be received
         sem_wait(&sem_display);
 
-        clear();
+        move(0, 0);
 
         // Display the map
         for (int i = 0; i < MAP_HEIGHT; i++) {
@@ -141,6 +141,7 @@ void* thread_inputs(void* arg)
         case CONTROL_KEY_LEFT: send_message_move(client_msqid, DIRECTION_LEFT); break;
         case CONTROL_KEY_RIGHT: send_message_move(client_msqid, DIRECTION_RIGHT); break;
         case CONTROL_KEY_PLACE_BOMB: send_message_place_bomb(client_msqid); break;
+        case CONTROL_KEY_REFRESH: clear(); sem_post(&sem_display); break;
         default: break;
         }
     }

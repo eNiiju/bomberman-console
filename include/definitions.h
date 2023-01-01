@@ -13,9 +13,8 @@
 /*                                 Constants                                 */
 /* ------------------------------------------------------------------------- */
 
-// Paths
+// Miscelaneous
 #define TOKEN_PATH_NAME "/etc/passwd"
-#define PATH_MAPS    "./assets/maps/"
 #define MAX_LENGTH_PATH_TO_MAP    100
 
 // Message types
@@ -54,6 +53,7 @@
 #define CONTROL_KEY_LEFT       'q'
 #define CONTROL_KEY_RIGHT      'd'
 #define CONTROL_KEY_PLACE_BOMB ' '
+#define CONTROL_KEY_REFRESH    'r' // Used to refresh the display
 
 /* ------------------------------------------------------------------------- */
 /*                                Structures                                 */
@@ -93,6 +93,7 @@ struct game {
     bool ended;
     int winner; // Winner's player number, -1 if no winner
     int player_count;
+    char path_to_map_file[MAX_LENGTH_PATH_TO_MAP];
     char map[MAP_WIDTH][MAP_HEIGHT];
     struct player players[MAX_PLAYERS];
 };

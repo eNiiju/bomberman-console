@@ -22,9 +22,10 @@
 
 /**
  * Set up and initialize the server.
+ * @param path_to_map_file The path to file of the map to use.
  * @return true if successful, false otherwise
 */
-bool setup(void);
+bool setup(char* path_to_map_file);
 
 /**
  * Function handling players' actions.
@@ -49,9 +50,9 @@ void* thread_game(void* arg);
  * property of the global variable "game".
  * Store the player's spawn points in their respective
  * coordinates, but not in the map.
- * @param map_name The name of the map file.
+ * @param path_to_map_file The path to map's file.
 */
-void retrieve_map_data(const char* map_name);
+void retrieve_map_data(char* path_to_map_file);
 
 /**
  * Creates a player if it's not already added, initializes it's values and
@@ -119,3 +120,16 @@ void* thread_move_player(void* arg);
  * @param arg (int*) The player's number.
 */
 void* thread_place_bomb(void* arg);
+
+/**
+ * Returns if a player is being killed by a bomb's explosion
+ * in the current game state of the global variable "game".
+ * @param player_number The player's number.
+*/
+bool check_player_death(int player_number);
+
+/**
+ * Checks if the game is over, and if it is, sets the winner
+ * and end the game. If the game is not over, it does nothing.
+*/
+void check_game_end(void);
