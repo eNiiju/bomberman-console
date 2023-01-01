@@ -53,6 +53,6 @@ struct message_server_game_state {
 struct message_server_game_end {
     long mtype; // MESSAGE_SERVER_GAME_END_TYPE
     struct {
-        int winner; // Winner's player index, -1 if no winner
+        int winner; // Winner's player index
     } mcontent;
 };

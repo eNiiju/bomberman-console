@@ -24,6 +24,9 @@ sem_t sem_display;
 
 int main(void)
 {
+    struct message_server_response response;
+    pthread_t th_game_state, th_game_end;
+
     pid = getpid();
 
     // Enter the game code
@@ -36,21 +39,18 @@ int main(void)
     send_message_connection(msqid, getpid());
 
     // Wait for the server response
-    struct message_server_response response;
     msgrcv(msqid, &response, sizeof(response.mcontent), pid, 0);
 
     if (!response.mcontent.success) {
         printf("Connection refused.\n");
         return EXIT_FAILURE;
     }
-
     printf("Connected!\n");
 
     // Retrieve the client's message queue ID
     client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);
 
     // Start threads that will handle the server's messages in the client's message queue
-    pthread_t th_game_state, th_game_end;
     pthread_create(&th_game_state, NULL, thread_message_game_state, NULL);
     pthread_create(&th_game_end, NULL, thread_message_game_end, NULL);
     pthread_join(th_game_state, NULL);
@@ -66,7 +66,7 @@ void* thread_display(void* arg)
     while (game_running) {
         // Wait for the game state to be received
         sem_wait(&sem_display);
-        
+
         clear();
 
         // Display the map
@@ -74,17 +74,18 @@ void* thread_display(void* arg)
             for (int n = 0; n < 2; n++) { // Print 2 times each line
                 for (int j = 0; j < MAP_WIDTH; j++) {
                     switch (game.map[j][i]) {
-                    case MAP_CASE_WALL: printw("####"); break;
-                    case MAP_CASE_BREAKABLE_WALL: printw("////"); break;
-                    case MAP_CASE_BOMB: printw(" oo "); break;
-                    case MAP_CASE_EXPLOSION: printw("xxxx"); break;
-                    case MAP_CASE_EMPTY: printw("    "); break;
+                    case MAP_TILE_WALL: printw("####"); break;
+                    case MAP_TILE_BREAKABLE_WALL: printw("////"); break;
+                    case MAP_TILE_BOMB: printw(" oo "); break;
+                    case MAP_TILE_EXPLOSION: printw("xxxx"); break;
+                    case MAP_TILE_EMPTY: printw("    "); break;
                     }
                 }
-                
                 move(i * 2 + n + 1, 0);
             }
         }
+
+        // TODO: Display bombs
 
         // Display players
         int x, y;
@@ -115,11 +116,11 @@ void* thread_inputs(void* arg)
 
         // Send the input to the server if it is a valid one
         switch (c) {
-        case _KEY_UP: send_message_move(client_msqid, DIRECTION_UP); break;
-        case _KEY_DOWN: send_message_move(client_msqid, DIRECTION_DOWN); break;
-        case _KEY_LEFT: send_message_move(client_msqid, DIRECTION_LEFT); break;
-        case _KEY_RIGHT: send_message_move(client_msqid, DIRECTION_RIGHT); break;
-        case _KEY_PLACE_BOMB: send_message_place_bomb(client_msqid); break;
+        case CONTROL_KEY_UP: send_message_move(client_msqid, DIRECTION_UP); break;
+        case CONTROL_KEY_DOWN: send_message_move(client_msqid, DIRECTION_DOWN); break;
+        case CONTROL_KEY_LEFT: send_message_move(client_msqid, DIRECTION_LEFT); break;
+        case CONTROL_KEY_RIGHT: send_message_move(client_msqid, DIRECTION_RIGHT); break;
+        case CONTROL_KEY_PLACE_BOMB: send_message_place_bomb(client_msqid); break;
         default: break;
         }
     }
@@ -132,7 +133,7 @@ void* thread_inputs(void* arg)
 void* thread_message_game_state(void* arg)
 {
     struct message_server_game_state msg_game_state;
- 
+
     // Initialize the semaphore used to display the game state
     // Display thread is asked to display the map every time the game state is received
     sem_init(&sem_display, 0, 0);
@@ -153,7 +154,7 @@ void* thread_message_game_state(void* arg)
             printf("Game started!\n");
 
             // Initialize the ncurses window & disable echoing of typed characters
-            initscr(); 
+            initscr();
             noecho();
 
             // Start threads that will handle the inputs & displaying the game state
@@ -181,7 +182,9 @@ void* thread_message_game_end(void* arg)
     // Receive game end message
     msgrcv(client_msqid, &msg_game_end, sizeof(msg_game_end.mcontent), MESSAGE_SERVER_GAME_END_TYPE, 0);
 
-    // TODO : Handle game end
+    // Display the winner
+    printf("Game ended. Winner : Player %d. Congrats!\n", msg_game_end.mcontent.winner + 1);
+
     game_running = false;
 
     pthread_exit(NULL);
