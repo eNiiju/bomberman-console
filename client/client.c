@@ -75,6 +75,7 @@ void* thread_display(void* arg)
         display_map(&game);
         display_bombs(&game);
         display_players(&game);
+        print_informations(&game);
 
         refresh();
     }
@@ -165,6 +166,7 @@ void* thread_message_game_end(void* arg)
     game_running = false;
 
     // Game has ended, close the ncurses window
+    clear();
     endwin();
 
     // End the display thread

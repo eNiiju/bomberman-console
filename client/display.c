@@ -94,3 +94,39 @@ void print_tile(int x, int y, char c)
             addch(c);
     }
 }
+
+void print_informations(struct game* game)
+{
+    move(5, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("BomberTTY");
+
+    move(6, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("You're playing on the map bbtty_default\n");
+
+    move(8, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("Welcome to the game, your goal is to kill\n");
+
+    move(9, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("your opponents by placing bombs on the map.\n");
+
+    move(11, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Move up : %c\n", CONTROL_KEY_UP);
+
+    move(12, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Move down : %c\n", CONTROL_KEY_DOWN);
+
+    move(13, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Move left : %c\n", CONTROL_KEY_LEFT);
+
+    move(14, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Move right : %c\n", CONTROL_KEY_RIGHT);
+
+    move(15, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Place a bomb : SPACE\n");
+
+    move(16, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("- Refresh the game : %c\n", CONTROL_KEY_REFRESH);
+
+    move(18, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("Players alive : %d / %d\n", game->player_count, MAX_PLAYERS);
+}

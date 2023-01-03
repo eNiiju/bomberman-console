@@ -40,3 +40,9 @@ void display_players(struct game* game);
  * @param c The character to print
 */
 void print_tile(int x, int y, char c);
+
+/**
+ * Prints informations about the game under the map.
+ * @param game The game state
+*/
+void print_informations(struct game* game);
