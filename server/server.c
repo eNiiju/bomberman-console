@@ -45,7 +45,6 @@ int main(int argc, char* argv[])
     pthread_join(th_game, NULL);
 
     // Game ended, clean up
-
     if (!clean_exit()) {
         printf("Clean exit failed.\n");
         return EXIT_FAILURE;
@@ -83,6 +82,7 @@ bool setup(char* path_to_map_file)
         return false;
     }
     strcpy(game.path_to_map_file, path_to_map_file);
+    retrieve_map_name(path_to_map_file);
 
     if (game.msqid == -1) {
         perror("Error while creating message queue");
@@ -124,7 +124,7 @@ void* thread_player(void* arg)
 
     // Send response to client
     send_connection_response(game.msqid, true, pid_client);
-    printf("Player %d joined the game.\n", player_number + 1);
+    printf("Player %d joined the game\n", player_number + 1);
 
     // Wait for client's messages
     pthread_create(&th_msg_move, NULL, thread_player_message_move, (void*)&player_number);
@@ -141,7 +141,7 @@ void* thread_game(void* arg)
 {
     retrieve_map_data(game.path_to_map_file);
 
-    printf("\nGame has started!\n\n");
+    printf("\nGame has started!\n");
 
     while (!game.ended) {
         // Send the game state to all clients
@@ -155,7 +155,7 @@ void* thread_game(void* arg)
         check_game_end();
     }
 
-    printf("\nGame has ended.\n");
+    printf("Game has ended.\n");
 
     pthread_exit(NULL);
 }
@@ -388,6 +388,7 @@ void* thread_move_player(void* arg)
     if (check_player_death(player_number)) {
         game.players[player_number].alive = false;
         game.player_count--;
+        printf("Player %d died\n", player_number + 1);
     }
 
     pthread_exit(NULL);
@@ -410,6 +411,8 @@ void* thread_place_bomb(void* arg)
         .range = game.players[player_number].bomb_range,
         .exploded = false
     };
+
+    printf("Player %d placed a bomb at (%d, %d)\n", player_number + 1, x, y);
 
     // Wait for the bomb to explode
     usleep(BOMB_EXPLOSION_TIMER_MS * 1000);
@@ -460,6 +463,7 @@ void* thread_place_bomb(void* arg)
         if (game.players[i].alive && check_player_death(i)) {
             game.players[i].alive = false;
             game.player_count--;
+            printf("Player %d died\n", i + 1);
         }
 
     // Wait a bit
@@ -542,6 +546,8 @@ void check_game_end(void)
     while (!game.players[winner].alive)
         winner++;
 
+    printf("Player %d won!\n", winner + 1);
+
     game.ended = true;
 
     // Tell the clients to stop waiting for messages
@@ -551,4 +557,17 @@ void check_game_end(void)
     // Send the winner to the clients
     for (int i = 0; i < MAX_PLAYERS; i++)
         send_game_end(get_client_msqid(game.players[i].pid_client), winner);
+}
+
+
+
+void retrieve_map_name(char* path_to_map)
+{
+    char* p = strrchr(path_to_map, '/'); // Find the last occurrence
+    if (p == NULL)
+        // '/' not found, so the file name is the entire string
+        strcpy(game.map_name, path_to_map);
+    else
+        // The file name is the character after the last '/'
+        strcpy(game.map_name, p + 1);
 }

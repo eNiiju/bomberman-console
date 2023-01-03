@@ -1,7 +1,3 @@
-todo :
-- Powerup for more bomb range
-- cooldown for moving
-
 # BomberTTY
 
 BomberTTY is a terminal based simple bomberman clone entirely written in C, with

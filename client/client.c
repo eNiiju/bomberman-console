@@ -164,9 +164,11 @@ void* thread_message_game_end(void* arg)
     msgrcv(client_msqid, &msg_game_end, sizeof(msg_game_end.mcontent), MESSAGE_SERVER_GAME_END_TYPE, 0);
 
     game_running = false;
+    sleep(1);
 
     // Game has ended, close the ncurses window
     clear();
+    refresh();
     endwin();
 
     // End the display thread

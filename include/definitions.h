@@ -16,6 +16,7 @@
 // Miscelaneous
 #define TOKEN_PATH_NAME "/etc/passwd"
 #define MAX_LENGTH_PATH_TO_MAP    100
+#define MAX_LENGTH_MAP_NAME        20
 
 // Message types
 #define MESSAGE_CLIENT_CONNECTION_TYPE    1
@@ -97,6 +98,7 @@ struct game {
     bool ended;
     int winner; // Winner's player number, -1 if no winner
     int player_count;
+    char map_name[MAX_LENGTH_MAP_NAME];
     char path_to_map_file[MAX_LENGTH_PATH_TO_MAP];
     char map[MAP_WIDTH][MAP_HEIGHT];
     struct player players[MAX_PLAYERS];

@@ -95,13 +95,15 @@ void print_tile(int x, int y, char c)
     }
 }
 
+
+
 void print_informations(struct game* game)
 {
     move(5, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
     printw("BomberTTY");
 
     move(6, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
-    printw("You're playing on the map bbtty_default\n");
+    printw("You're playing on the map %s\n", game->map_name);
 
     move(8, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
     printw("Welcome to the game, your goal is to kill\n");

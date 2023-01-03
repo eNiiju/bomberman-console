@@ -139,3 +139,10 @@ bool check_player_death(int player_number);
  * and end the game. If the game is not over, it does nothing.
 */
 void check_game_end(void);
+
+/**
+ * Stores the name of the map in the property "map_name" of the
+ * global variable "game".
+ * @param path_to_map The path to the map's file.
+*/
+void retrieve_map_name(char* path_to_map);
