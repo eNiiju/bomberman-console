@@ -23,16 +23,6 @@ bool send_message_connection(int main_msqid, pid_t pid)
 
 
 
-bool send_message_disconnection(int client_msqid)
-{
-    struct message_client_disconnection msg = {
-        .mtype = MESSAGE_CLIENT_DISCONNECTION_TYPE
-    };
-    return msgsnd(client_msqid, &msg, 0, 0) != -1;
-}
-
-
-
 bool send_message_move(int client_msqid, int direction)
 {
     struct message_client_move msg = {

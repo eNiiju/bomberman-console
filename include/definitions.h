@@ -45,13 +45,31 @@
 #define REFRESH_DELAY_MS         100
 
 // Map tiles
-#define MAP_TILE_SIZE_X           4
-#define MAP_TILE_SIZE_Y           2
-#define MAP_TILE_EMPTY          ' '
-#define MAP_TILE_WALL           '#'
-#define MAP_TILE_BREAKABLE_WALL '/'
-#define MAP_TILE_BOMB           'o'
-#define MAP_TILE_EXPLOSION      'x'
+#define MAP_TILE_SIZE_X                4
+#define MAP_TILE_SIZE_Y                2
+#define MAP_TILE_EMPTY               ' '
+#define MAP_TILE_WALL                '#'
+#define MAP_TILE_BREAKABLE_WALL      '/'
+#define MAP_TILE_BOMB                'o'
+#define MAP_TILE_EXPLOSION           'x'
+#define MAP_TILE_PLAYER_1            '1'
+#define MAP_TILE_PLAYER_2            '2'
+#define MAP_TILE_PLAYER_3            '3'
+#define MAP_TILE_PLAYER_4            '4'
+
+// Colors
+#define MAP_TILE_COLOR_EMPTY          0
+#define MAP_TILE_COLOR_WALL           1
+#define MAP_TILE_COLOR_BREAKABLE_WALL 2
+#define MAP_TILE_COLOR_BOMB           3
+#define MAP_TILE_COLOR_EXPLOSION      4
+#define MAP_TILE_COLOR_PLAYER_1       5
+#define MAP_TILE_COLOR_PLAYER_2       6
+#define MAP_TILE_COLOR_PLAYER_3       7
+#define MAP_TILE_COLOR_PLAYER_4       8
+#define TEXT_COLOR_TITLE              9
+#define TEXT_COLOR_MAP_NAME          10
+#define TEXT_COLOR_CONTROL_KEY       11
 
 // Player control keys
 #define CONTROL_KEY_UP         'z'

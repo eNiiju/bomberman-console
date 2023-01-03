@@ -148,9 +148,7 @@ void* thread_message_game_state(void* arg)
                 i++;
             player_number = i;
 
-            // Initialize the ncurses window & disable echoing of typed characters
-            initscr();
-            noecho();
+            init_display();
 
             // Start threads that will handle the inputs & displaying the game state
             pthread_t th_display, th_inputs;

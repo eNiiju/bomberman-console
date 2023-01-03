@@ -16,6 +16,12 @@
 /* ------------------------------------------------------------------------- */
 
 /**
+ * Initializes the everything needed for the
+ * displaying of the game to work.
+*/
+void init_display();
+
+/**
  * Displays the map on the ncurses window.
  * @param game The game state
 */
@@ -38,8 +44,9 @@ void display_players(struct game* game);
  * @param x The x coordinate of the tile
  * @param y The y coordinate of the tile
  * @param c The character to print
+ * @param color_pair The color pair to use
 */
-void print_tile(int x, int y, char c);
+void print_tile(int x, int y, char c, int color_pair);
 
 /**
  * Prints informations about the game under the map.

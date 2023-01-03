@@ -28,13 +28,6 @@
 bool send_message_connection(int main_msqid, pid_t pid);
 
 /**
- * Sends a "disconnection" message to the server.
- * @param client_msqid The client's message queue ID.
- * @return true if the message was sent successfully, false otherwise
-*/
-bool send_message_disconnection(int client_msqid);
-
-/**
  * Sends a "move" message to the server.
  * @param client_msqid The client's message queue ID.
  * @param direction The direction the player wants to move.

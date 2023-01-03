@@ -17,10 +17,6 @@ struct message_client_connection {
     } mcontent;
 };
 
-struct message_client_disconnection {
-    long mtype; // MESSAGE_CLIENT_DISCONNECTION_TYPE
-};
-
 struct message_client_move {
     long mtype; // MESSAGE_CLIENT_MOVE_TYPE
     struct {

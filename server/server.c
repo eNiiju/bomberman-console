@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
 bool setup(char* number_of_players, char* path_to_map_file)
 {
     // Check arguments
-    if (atoi(number_of_players) > MAX_PLAYERS) {
-        printf("Too many players. (Should be under %d)\n", MAX_PLAYERS);
+    if (atoi(number_of_players) > MAX_PLAYERS || atoi(number_of_players) < 2) {
+        printf("Wrong player number. (Should be between 2 and %d)\n", MAX_PLAYERS);
         return false;
     }
 
