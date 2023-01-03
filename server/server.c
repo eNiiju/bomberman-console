@@ -193,7 +193,7 @@ void retrieve_map_data(char* path_to_map_file)
     i = 0;
     while (i < MAX_MAP_WIDTH && lines[0][i] != '\0')
         i++;
-    
+
     game.map_width = i;
 
     printf("Map size: %dx%d\n", game.map_width, game.map_height);
@@ -207,8 +207,10 @@ void retrieve_map_data(char* path_to_map_file)
                 // (will be replaced by the player on the client display)
                 // Only up to the number of players !
                 int player_number = c - '1';
-                if (player_number < game.number_of_players)
+                if (player_number < game.number_of_players) {
                     game.players[player_number].coords = (struct coordinates){ column, line };
+                    printf("Player %d will spawn at (%d, %d)\n", player_number + 1, column, line);
+                }
                 game.map[line][column] = MAP_TILE_EMPTY;
             }
             else

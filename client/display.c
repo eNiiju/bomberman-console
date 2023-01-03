@@ -132,6 +132,17 @@ void display_informations(struct game* game, int player_number)
     move(13, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("Players alive : %d / %d\n", game->player_count, game->number_of_players);
 
+    int x = game->players[player_number].coords.x;
+    int y = game->players[player_number].coords.y;
+
     move(14, game->map_width * MAP_TILE_SIZE_X + 2);
-    printw("You are : Player %d\n", player_number + 1);
+    printw("You are : Player %d at (%d, %d)\n", player_number + 1, x, y);
+
+    move(15, game->map_width * MAP_TILE_SIZE_X + 2);
+    printw("Your bomb range : %d\n", game->players[player_number].bomb_range);
+
+    if (!game->players[player_number].alive) {
+        move(17, game->map_width * MAP_TILE_SIZE_X + 2);
+        printw("You are dead !\n");
+    }
 }

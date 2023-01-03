@@ -47,7 +47,7 @@ int main(void)
         return EXIT_FAILURE;
     }
     printf("Connected! Waiting for the game to start...\n");
-    printf("Hint: Press 'r' to refresh the display if there's a display glitch.\n");
+    printf("Hint: Press '%c' to refresh the display if there's a display glitch.\n", CONTROL_KEY_REFRESH);
 
     // Retrieve the client's message queue ID
     client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);

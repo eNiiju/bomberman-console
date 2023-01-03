@@ -31,11 +31,11 @@ git clone https://github.com/eNiiju/Bombertty.git
 make
 ```
 
-3. Run the server with the map you want to play on
+3. Run the server with the number of players and the map you want to play on
 
 ```
 cd server/
-./server <path_to_map>
+./server <number_of_players> <path_to_map>
 ```
 
 4. Run the client on each computer you want to play on
@@ -62,11 +62,11 @@ You can name it anything you like.
 
 Inside this file, you'll need to write a character for each tile of the map :
 - `#` for a wall
-- `' '` for an empty tile (space)
+- ` ` for an empty tile (space)
 - `/` for a breakable wall
 - `1` for a player spawn point (You must set 4 spawnpoints)
 
-The map **must** be rectangle !
+The map **must** be rectangle and not bigger than 50x50 !
 
 *Note: The player spawnpoints will be empty tiles during the game.*
 
