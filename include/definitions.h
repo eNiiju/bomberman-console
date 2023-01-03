@@ -8,15 +8,16 @@
 #define DEFINITIONS_H
 
 #include <stdbool.h>
+#include <limits.h>
 
 /* ------------------------------------------------------------------------- */
 /*                                 Constants                                 */
 /* ------------------------------------------------------------------------- */
 
 // Miscelaneous
-#define TOKEN_PATH_NAME "/etc/passwd"
-#define MAX_LENGTH_PATH_TO_MAP    100
-#define MAX_LENGTH_MAP_NAME        20
+#define TOKEN_PATH_NAME   "/etc/passwd"
+#define MAX_LENGTH_PATH_TO_MAP PATH_MAX
+#define MAX_LENGTH_MAP_NAME    NAME_MAX
 
 // Message types
 #define MESSAGE_CLIENT_CONNECTION_TYPE    1
@@ -34,7 +35,7 @@
 #define DIRECTION_RIGHT 4
 
 // Game default values & constants
-#define MAX_PLAYERS                2 // TODO: Change to 4
+#define MAX_PLAYERS                4
 #define DEFAULT_BOMB_RANGE         2
 #define MAP_WIDTH                 15
 #define MAP_HEIGHT                15
@@ -97,7 +98,8 @@ struct game {
     int msqid; // Main message queue ID
     bool ended;
     int winner; // Winner's player number, -1 if no winner
-    int player_count;
+    int player_count; // Players that are still alive
+    int number_of_players;
     char map_name[MAX_LENGTH_MAP_NAME];
     char path_to_map_file[MAX_LENGTH_PATH_TO_MAP];
     char map[MAP_WIDTH][MAP_HEIGHT];

@@ -22,10 +22,11 @@
 
 /**
  * Set up and initialize the server.
+ * @param number_of_players The number of players.
  * @param path_to_map_file The path to file of the map to use.
  * @return true if successful, false otherwise
 */
-bool setup(char* path_to_map_file);
+bool setup(char* number_of_players, char* path_to_map_file);
 
 /**
  * Cleans up the server before exiting the program.

@@ -54,3 +54,7 @@ cd <path_to_folder>/client/
 ```
 
 5. Enjoy !
+
+# Create your own map
+
+TODO

@@ -15,6 +15,7 @@ int client_msqid;
 bool game_running = false;
 struct game game;
 sem_t sem_display;
+int player_number;
 
 
 
@@ -46,6 +47,7 @@ int main(void)
         return EXIT_FAILURE;
     }
     printf("Connected! Waiting for the game to start...\n");
+    printf("Hint: Press 'r' to refresh the display if there's a display glitch.\n");
 
     // Retrieve the client's message queue ID
     client_msqid = msgget(ftok(TOKEN_PATH_NAME, pid), 0);
@@ -75,7 +77,7 @@ void* thread_display(void* arg)
         display_map(&game);
         display_bombs(&game);
         display_players(&game);
-        print_informations(&game);
+        display_informations(&game, player_number);
 
         refresh();
     }
@@ -139,6 +141,12 @@ void* thread_message_game_state(void* arg)
         if (!game_running) {
             game_running = true;
             printf("Game started!\n");
+
+            // Retrieve the player number
+            int i = 0;
+            while (game.players[i].pid_client != pid)
+                i++;
+            player_number = i;
 
             // Initialize the ncurses window & disable echoing of typed characters
             initscr();

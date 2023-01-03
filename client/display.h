@@ -44,5 +44,6 @@ void print_tile(int x, int y, char c);
 /**
  * Prints informations about the game under the map.
  * @param game The game state
+ * @param player_number The player number
 */
-void print_informations(struct game* game);
+void display_informations(struct game* game, int player_number);

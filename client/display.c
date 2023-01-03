@@ -21,7 +21,7 @@ void display_map(struct game* game)
 
 void display_bombs(struct game* game)
 {
-    for (int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < game->number_of_players; i++) {
         if (!game->players[i].alive || !game->players[i].bomb.active)
             continue;
 
@@ -74,7 +74,7 @@ void display_bombs(struct game* game)
 
 void display_players(struct game* game)
 {
-    for (int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < game->number_of_players; i++) {
         if (!game->players[i].alive)
             continue;
 
@@ -97,7 +97,7 @@ void print_tile(int x, int y, char c)
 
 
 
-void print_informations(struct game* game)
+void display_informations(struct game* game, int player_number)
 {
     move(5, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
     printw("BomberTTY");
@@ -106,7 +106,7 @@ void print_informations(struct game* game)
     printw("You're playing on the map %s\n", game->map_name);
 
     move(8, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
-    printw("Welcome to the game, your goal is to kill\n");
+    printw("Welcome to the game ! your goal is to kill\n");
 
     move(9, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
     printw("your opponents by placing bombs on the map.\n");
@@ -127,8 +127,11 @@ void print_informations(struct game* game)
     printw("- Place a bomb : SPACE\n");
 
     move(16, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
-    printw("- Refresh the game : %c\n", CONTROL_KEY_REFRESH);
+    printw("- Refresh the screen : %c\n", CONTROL_KEY_REFRESH);
 
     move(18, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
-    printw("Players alive : %d / %d\n", game->player_count, MAX_PLAYERS);
+    printw("Players alive : %d / %d\n", game->player_count, game->number_of_players);
+
+    move(19, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    printw("You are : Player %d\n", player_number + 1);
 }

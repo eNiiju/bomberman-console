@@ -25,12 +25,12 @@ int main(int argc, char* argv[])
     pthread_t th_main_msq, th_game;
 
     // Check if the map file is provided
-    if (argc < 2) {
-        printf("Usage: %s <path_to_map_file>\n", argv[0]);
+    if (argc < 3) {
+        printf("Usage: %s <number_of_players> <path_to_map_file>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    if (!setup(argv[1])) {
+    if (!setup(argv[1], argv[2])) {
         printf("Server setup failed.\n");
         return EXIT_FAILURE;
     }
@@ -56,8 +56,14 @@ int main(int argc, char* argv[])
 
 
 
-bool setup(char* path_to_map_file)
+bool setup(char* number_of_players, char* path_to_map_file)
 {
+    // Check arguments
+    if (atoi(number_of_players) > MAX_PLAYERS) {
+        printf("Too many players. (Should be under %d)\n", MAX_PLAYERS);
+        return false;
+    }
+
     // Initialize mutexes
     pthread_mutex_init(&mut_start_game, NULL);
     pthread_mutex_init(&mut_create_player, NULL);
@@ -73,14 +79,10 @@ bool setup(char* path_to_map_file)
         .game_code = rand() % 10000,
         .ended = false,
         .winner = -1,
-        .player_count = 0
+        .player_count = 0,
+        .number_of_players = atoi(number_of_players)
     };
     game.msqid = create_message_queue(game.game_code);
-
-    if (strlen(path_to_map_file) > MAX_LENGTH_PATH_TO_MAP) {
-        printf("Path to map file is too long. (Should be under %d characters)\n", MAX_LENGTH_PATH_TO_MAP);
-        return false;
-    }
     strcpy(game.path_to_map_file, path_to_map_file);
     retrieve_map_name(path_to_map_file);
 
@@ -99,7 +101,7 @@ bool clean_exit()
     msgctl(game.msqid, IPC_RMID, NULL);
 
     // Delete all players' message queues
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < game.number_of_players; i++)
         msgctl(get_client_msqid(game.players[i].pid_client), IPC_RMID, NULL);
 
     // Destroy mutexes
@@ -141,11 +143,13 @@ void* thread_game(void* arg)
 {
     retrieve_map_data(game.path_to_map_file);
 
+    sleep(3);
+
     printf("\nGame has started!\n");
 
     while (!game.ended) {
         // Send the game state to all clients
-        for (int i = 0; i < MAX_PLAYERS; i++) {
+        for (int i = 0; i < game.number_of_players; i++) {
             int client_msqid = get_client_msqid(game.players[i].pid_client);
             send_game_state(client_msqid, game, false);
         }
@@ -186,10 +190,13 @@ void retrieve_map_data(char* path_to_map_file)
     for (int line = 0; line < MAP_HEIGHT; line++) {
         for (int column = 0; column < MAP_WIDTH; column++) {
             char c = lines[line][column];
-            if (c == '1' || c == '2' || c == '3' || c == '4') {
+            if (c > '0' && c <= '0' + MAX_PLAYERS) {
                 // If it's a player, set it's coordinates and set the case to empty
                 // (will be replaced by the player on the client display)
-                game.players[c - '1'].coords = (struct coordinates){ column, line };
+                // Only up to the number of players !
+                int player_number = c - '1';
+                if (player_number < game.number_of_players)
+                    game.players[player_number].coords = (struct coordinates){ column, line };
                 game.map[line][column] = MAP_TILE_EMPTY;
             }
             else
@@ -247,12 +254,12 @@ void* thread_main_message_queue(void* arg)
         msgrcv(game.msqid, &msg, sizeof(msg.mcontent), MESSAGE_CLIENT_CONNECTION_TYPE, 0);
         pid_t pid_client = msg.mcontent.pid_client;
 
-        if (game.player_count < MAX_PLAYERS) {
+        if (game.player_count < game.number_of_players) {
             bool player_created = create_player(pid_client);
             send_connection_response(game.msqid, player_created, pid_client);
 
             // If the players is now full, unlock the mutex to start the game
-            if (game.player_count == MAX_PLAYERS)
+            if (game.player_count == game.number_of_players)
                 pthread_mutex_unlock(&mut_start_game);
         }
         else
@@ -334,7 +341,7 @@ bool player_can_move(int player_number, int direction)
     }
 
     // Check if there is a player on this case
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < game.number_of_players; i++)
         if (i != player_number
             && game.players[i].alive
             && game.players[i].coords.x == coords.x
@@ -459,7 +466,7 @@ void* thread_place_bomb(void* arg)
     }
 
     // Check if the bomb killed a player
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < game.number_of_players; i++)
         if (game.players[i].alive && check_player_death(i)) {
             game.players[i].alive = false;
             game.player_count--;
@@ -483,7 +490,7 @@ bool check_player_death(int player_number)
     int player_y = game.players[player_number].coords.y;
 
     // For each bomb on the map
-    for (int i = 0; i < MAX_PLAYERS; i++) {
+    for (int i = 0; i < game.number_of_players; i++) {
         if (game.players[i].alive && game.players[i].bomb.active && game.players[i].bomb.exploded) {
             int bomb_x = game.players[i].bomb.coords.x;
             int bomb_y = game.players[i].bomb.coords.y;
@@ -551,11 +558,11 @@ void check_game_end(void)
     game.ended = true;
 
     // Tell the clients to stop waiting for messages
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < game.number_of_players; i++)
         send_game_state(get_client_msqid(game.players[i].pid_client), game, true);
 
     // Send the winner to the clients
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < game.number_of_players; i++)
         send_game_end(get_client_msqid(game.players[i].pid_client), winner);
 }
 
