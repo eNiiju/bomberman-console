@@ -67,6 +67,9 @@ void* thread_display(void* arg)
         // Wait for the game state to be received
         sem_wait(&sem_display);
 
+        if (!game_running)
+            break;
+
         move(0, 0);
 
         display_map(&game);
@@ -83,9 +86,15 @@ void* thread_display(void* arg)
 
 void* thread_inputs(void* arg)
 {
+    // Set the timeout for the getch() function
+    timeout(1000);
+
     while (game_running) {
         // Get the input
         int c = getch();
+
+        if (!game_running)
+            break;
 
         // Send the input to the server if it is a valid one
         switch (c) {
@@ -116,6 +125,9 @@ void* thread_message_game_state(void* arg)
         // Receive game state message
         msgrcv(client_msqid, &msg_game_state, sizeof(msg_game_state.mcontent), MESSAGE_SERVER_GAME_STATE_TYPE, 0);
 
+        if (msg_game_state.mcontent.stop)
+            break;
+
         // Store the game state in the global variable
         game = msg_game_state.mcontent.game_state;
 
@@ -138,12 +150,6 @@ void* thread_message_game_state(void* arg)
         }
     } while (game_running);
 
-    // Game has ended, close the ncurses window
-    endwin();
-
-    // Destroy the display semaphore
-    sem_destroy(&sem_display);
-
     pthread_exit(NULL);
 }
 
@@ -156,10 +162,19 @@ void* thread_message_game_end(void* arg)
     // Receive game end message
     msgrcv(client_msqid, &msg_game_end, sizeof(msg_game_end.mcontent), MESSAGE_SERVER_GAME_END_TYPE, 0);
 
+    game_running = false;
+
+    // Game has ended, close the ncurses window
+    endwin();
+
+    // End the display thread
+    sem_post(&sem_display);
+
+    // Destroy the display semaphore
+    sem_destroy(&sem_display);
+
     // Display the winner
     printf("Game ended. Winner : Player %d. Congrats!\n", msg_game_end.mcontent.winner + 1);
-
-    game_running = false;
 
     pthread_exit(NULL);
 }

@@ -55,9 +55,10 @@ bool send_response(pid_t client_msqid, bool success);
  * It also indicates that the game has started.
  * @param client_msqid The destination client's message queue ID
  * @param game_state The game state
+ * @param stop true if the game has ended, false otherwise
  * @return true if the message was sent successfully, false otherwise
 */
-bool send_game_state(pid_t client_msqid, struct game game_state);
+bool send_game_state(pid_t client_msqid, struct game game_state, bool stop);
 
 /**
  * Send a message to the client to tell it that the game has ended.

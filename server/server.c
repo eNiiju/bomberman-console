@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
     pthread_join(th_game, NULL);
 
     // Game ended, clean up
+
     if (!clean_exit()) {
         printf("Clean exit failed.\n");
         return EXIT_FAILURE;
@@ -146,7 +147,7 @@ void* thread_game(void* arg)
         // Send the game state to all clients
         for (int i = 0; i < MAX_PLAYERS; i++) {
             int client_msqid = get_client_msqid(game.players[i].pid_client);
-            send_game_state(client_msqid, game);
+            send_game_state(client_msqid, game, false);
         }
 
         usleep(REFRESH_DELAY_MS * 1000);
@@ -542,6 +543,10 @@ void check_game_end(void)
         winner++;
 
     game.ended = true;
+
+    // Tell the clients to stop waiting for messages
+    for (int i = 0; i < MAX_PLAYERS; i++)
+        send_game_state(get_client_msqid(game.players[i].pid_client), game, true);
 
     // Send the winner to the clients
     for (int i = 0; i < MAX_PLAYERS; i++)

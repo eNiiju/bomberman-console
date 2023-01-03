@@ -46,6 +46,7 @@ struct message_server_response {
 struct message_server_game_state {
     long mtype; // MESSAGE_SERVER_GAME_STATE_TYPE
     struct {
+        bool stop; // true if the game is over, false otherwise
         struct game game_state;
     } mcontent;
 };

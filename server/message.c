@@ -50,11 +50,12 @@ bool send_response(pid_t client_msqid, bool success)
 
 
 
-bool send_game_state(pid_t client_msqid, struct game game_state)
+bool send_game_state(pid_t client_msqid, struct game game_state, bool stop)
 {
 struct message_server_game_state msg = {
         .mtype = MESSAGE_SERVER_GAME_STATE_TYPE,
         .mcontent = {
+            .stop = stop,
             .game_state = game_state
         }
     };
