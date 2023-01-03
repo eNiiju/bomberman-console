@@ -37,8 +37,8 @@
 // Game default values & constants
 #define MAX_PLAYERS                4
 #define DEFAULT_BOMB_RANGE         2
-#define MAP_WIDTH                 15
-#define MAP_HEIGHT                15
+#define MAX_MAP_WIDTH             50
+#define MAX_MAP_HEIGHT            50
 #define BOMB_EXPLOSION_TIMER_MS 3000
 #define PLAYER_MOVE_COOLDOWN_MS  100
 #define BOMB_FIRE_TIME_MS       2000
@@ -100,9 +100,11 @@ struct game {
     int winner; // Winner's player number, -1 if no winner
     int player_count; // Players that are still alive
     int number_of_players;
+    int map_height;
+    int map_width;
     char map_name[MAX_LENGTH_MAP_NAME];
     char path_to_map_file[MAX_LENGTH_PATH_TO_MAP];
-    char map[MAP_WIDTH][MAP_HEIGHT];
+    char map[MAX_MAP_WIDTH][MAX_MAP_HEIGHT];
     struct player players[MAX_PLAYERS];
 };
 

@@ -57,4 +57,36 @@ cd <path_to_folder>/client/
 
 # Create your own map
 
-TODO
+To create your own map, you only need a file.
+You can name it anything you like.
+
+Inside this file, you'll need to write a character for each tile of the map :
+- `#` for a wall
+- `' '` for an empty tile (space)
+- `/` for a breakable wall
+- `1` for a player spawn point (You must set 4 spawnpoints)
+
+The map **must** be rectangle !
+
+*Note: The player spawnpoints will be empty tiles during the game.*
+
+## Example
+
+```
+###############
+#1    // /   2#
+# # # # # # # #
+# / /    / /  #
+# # # # # # # #
+#   ///     //#
+# # # #/#/#/# #
+#//  //  //  /#
+# # # # #/# # #
+#  /        //#
+# # # # # # # #
+# ///      /  #
+# # # # # # # #
+#3  // /  /  4#
+###############
+```
+> bbtty_default

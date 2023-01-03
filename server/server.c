@@ -177,8 +177,8 @@ void retrieve_map_data(char* path_to_map_file)
 
     // Retrieve all lines in the map file
     int i = 0;
-    char lines[MAP_HEIGHT][MAP_WIDTH + 2];
-    while (fgets(lines[i], MAP_WIDTH + 2, map_file) != NULL) {
+    char lines[MAX_MAP_HEIGHT][MAX_MAP_WIDTH + 2];
+    while (fgets(lines[i], MAX_MAP_WIDTH + 2, map_file) != NULL) {
         // Remove the newline character from the end of the string
         size_t len = strlen(lines[i]);
         if (len > 0 && lines[i][len - 1] == '\n')
@@ -186,9 +186,21 @@ void retrieve_map_data(char* path_to_map_file)
         i++;
     }
 
+    // Map height
+    game.map_height = i;
+
+    // Map width (take the first line and assume it's a rectangle)
+    i = 0;
+    while (i < MAX_MAP_WIDTH && lines[0][i] != '\0')
+        i++;
+    
+    game.map_width = i;
+
+    printf("Map size: %dx%d\n", game.map_width, game.map_height);
+
     // Store the map data in the game structure
-    for (int line = 0; line < MAP_HEIGHT; line++) {
-        for (int column = 0; column < MAP_WIDTH; column++) {
+    for (int line = 0; line < game.map_height; line++) {
+        for (int column = 0; column < game.map_width; column++) {
             char c = lines[line][column];
             if (c > '0' && c <= '0' + MAX_PLAYERS) {
                 // If it's a player, set it's coordinates and set the case to empty
@@ -442,7 +454,7 @@ void* thread_place_bomb(void* arg)
 
         // Down
         next_x = x; next_y = y + j;
-        if (down == j && next_y < MAP_HEIGHT && game.map[next_y][next_x] != MAP_TILE_WALL) {
+        if (down == j && next_y < game.map_height && game.map[next_y][next_x] != MAP_TILE_WALL) {
             if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
             else down++;
@@ -458,7 +470,7 @@ void* thread_place_bomb(void* arg)
 
         // Right
         next_x = x + j; next_y = y;
-        if (right == j && next_x < MAP_WIDTH && game.map[next_y][next_x] != MAP_TILE_WALL) {
+        if (right == j && next_x < game.map_width && game.map[next_y][next_x] != MAP_TILE_WALL) {
             if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
             else right++;
@@ -513,7 +525,7 @@ bool check_player_death(int player_number)
 
                 // Down
                 next_x = bomb_x; next_y = bomb_y + j;
-                if (down == j && next_y < MAP_HEIGHT && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                if (down == j && next_y < game.map_height && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
                     if (player_x == next_x && player_y == next_y)
                         return true;
                     down++;
@@ -529,7 +541,7 @@ bool check_player_death(int player_number)
 
                 // Right
                 next_x = bomb_x + j; next_y = bomb_y;
-                if (right == j && next_x < MAP_WIDTH && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
+                if (right == j && next_x < game.map_width && game.map[next_y][next_x] == MAP_TILE_EMPTY) {
                     if (player_x == next_x && player_y == next_y)
                         return true;
                     right++;

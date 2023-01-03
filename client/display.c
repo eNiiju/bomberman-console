@@ -12,8 +12,8 @@
 
 void display_map(struct game* game)
 {
-    for (int line = 0; line < MAP_HEIGHT; line++)
-        for (int column = 0; column < MAP_WIDTH; column++)
+    for (int line = 0; line < game->map_height; line++)
+        for (int column = 0; column < game->map_width; column++)
             print_tile(column, line, game->map[line][column]);
 }
 
@@ -45,7 +45,7 @@ void display_bombs(struct game* game)
 
                 // Down
                 next_x = x; next_y = y + j;
-                if (down == j && next_y < MAP_HEIGHT && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                if (down == j && next_y < game->map_height && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
                     print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     down++;
                 }
@@ -59,7 +59,7 @@ void display_bombs(struct game* game)
 
                 // Right
                 next_x = x + j; next_y = y;
-                if (right == j && next_x < MAP_WIDTH && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
+                if (right == j && next_x < game->map_width && game->map[next_y][next_x] == MAP_TILE_EMPTY) {
                     print_tile(next_x, next_y, MAP_TILE_EXPLOSION);
                     right++;
                 }
@@ -99,39 +99,39 @@ void print_tile(int x, int y, char c)
 
 void display_informations(struct game* game, int player_number)
 {
-    move(5, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(0, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("BomberTTY");
 
-    move(6, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(1, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("You're playing on the map %s\n", game->map_name);
 
-    move(8, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(3, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("Welcome to the game ! your goal is to kill\n");
 
-    move(9, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(4, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("your opponents by placing bombs on the map.\n");
 
-    move(11, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(6, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Move up : %c\n", CONTROL_KEY_UP);
 
-    move(12, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(7, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Move down : %c\n", CONTROL_KEY_DOWN);
 
-    move(13, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(8, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Move left : %c\n", CONTROL_KEY_LEFT);
 
-    move(14, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(9, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Move right : %c\n", CONTROL_KEY_RIGHT);
 
-    move(15, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(10, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Place a bomb : SPACE\n");
 
-    move(16, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(11, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("- Refresh the screen : %c\n", CONTROL_KEY_REFRESH);
 
-    move(18, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(13, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("Players alive : %d / %d\n", game->player_count, game->number_of_players);
 
-    move(19, MAP_WIDTH * MAP_TILE_SIZE_X + 2);
+    move(14, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("You are : Player %d\n", player_number + 1);
 }
