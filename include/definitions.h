@@ -36,7 +36,8 @@
 
 // Game default values & constants
 #define MAX_PLAYERS                4
-#define DEFAULT_BOMB_RANGE         2
+#define DEFAULT_BOMB_RANGE         1
+#define MAX_BOMB_RANGE             5
 #define MAX_MAP_WIDTH             50
 #define MAX_MAP_HEIGHT            50
 #define BOMB_EXPLOSION_TIMER_MS 3000
@@ -105,6 +106,7 @@ struct player {
     struct coordinates coords;
     int bomb_range;
     struct bomb bomb;
+    bool can_move;
 };
 
 /**

@@ -238,7 +238,8 @@ bool create_player(pid_t pid_client)
         .pid_client = pid_client,
         .alive = true,
         .coords = {0, 0},
-        .bomb_range = DEFAULT_BOMB_RANGE
+        .bomb_range = DEFAULT_BOMB_RANGE,
+        .can_move = true
     };
 
     // Create the player thread
@@ -341,7 +342,11 @@ void* thread_player_message_place_bomb(void* arg)
 
 bool player_can_move(int player_number, int direction)
 {
-    // TODO : reject if the player doesnt have its cooldown
+    if (!game.players[player_number].alive)
+        return false;
+
+    if (!game.players[player_number].can_move)
+        return false;
 
     // Get the player coordinates
     struct coordinates coords = game.players[player_number].coords;
@@ -410,6 +415,16 @@ void* thread_move_player(void* arg)
         game.players[player_number].alive = false;
         game.player_count--;
         printf("Player %d died\n", player_number + 1);
+    }
+    else {
+        // Prevent the player from moving
+        game.players[player_number].can_move = false;
+
+        // Wait a bit (cooldown)
+        usleep(PLAYER_MOVE_COOLDOWN_MS * 1000);
+
+        // Allow the player to move again
+        game.players[player_number].can_move = true;
     }
 
     pthread_exit(NULL);
