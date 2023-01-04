@@ -54,3 +54,9 @@ void print_tile(int x, int y, char c, int color_pair);
  * @param player_number The player number
 */
 void display_informations(struct game* game, int player_number);
+
+/**
+ * Displays the powerups on the ncurses window.
+ * @param game The game state
+*/
+void display_powerups(struct game* game);

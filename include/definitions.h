@@ -35,15 +35,17 @@
 #define DIRECTION_RIGHT 4
 
 // Game default values & constants
-#define MAX_PLAYERS                4
-#define DEFAULT_BOMB_RANGE         1
-#define MAX_BOMB_RANGE             5
-#define MAX_MAP_WIDTH             50
-#define MAX_MAP_HEIGHT            50
-#define BOMB_EXPLOSION_TIMER_MS 3000
-#define PLAYER_MOVE_COOLDOWN_MS  100
-#define BOMB_FIRE_TIME_MS       2000
-#define REFRESH_DELAY_MS         100
+#define MAX_PLAYERS                           4
+#define DEFAULT_BOMB_RANGE                    1
+#define MAX_BOMB_RANGE                        5
+#define MAX_POWERUPS            3 * MAX_PLAYERS
+#define CHANCE_POWERUP_SPAWN_PERCENT         10
+#define MAX_MAP_WIDTH                        50
+#define MAX_MAP_HEIGHT                       50
+#define BOMB_EXPLOSION_TIMER_MS            3000
+#define PLAYER_MOVE_COOLDOWN_MS             100
+#define BOMB_FIRE_TIME_MS                  2000
+#define REFRESH_DELAY_MS                    100
 
 // Map tiles
 #define MAP_TILE_SIZE_X                4
@@ -53,6 +55,7 @@
 #define MAP_TILE_BREAKABLE_WALL      '/'
 #define MAP_TILE_BOMB                'o'
 #define MAP_TILE_EXPLOSION           'x'
+#define MAP_TILE_POWERUP             '$'
 #define MAP_TILE_PLAYER_1            '1'
 #define MAP_TILE_PLAYER_2            '2'
 #define MAP_TILE_PLAYER_3            '3'
@@ -64,13 +67,14 @@
 #define MAP_TILE_COLOR_BREAKABLE_WALL 2
 #define MAP_TILE_COLOR_BOMB           3
 #define MAP_TILE_COLOR_EXPLOSION      4
-#define MAP_TILE_COLOR_PLAYER_1       5
-#define MAP_TILE_COLOR_PLAYER_2       6
-#define MAP_TILE_COLOR_PLAYER_3       7
-#define MAP_TILE_COLOR_PLAYER_4       8
-#define TEXT_COLOR_TITLE              9
-#define TEXT_COLOR_MAP_NAME          10
-#define TEXT_COLOR_CONTROL_KEY       11
+#define MAP_TILE_COLOR_POWERUP        5
+#define MAP_TILE_COLOR_PLAYER_1       6
+#define MAP_TILE_COLOR_PLAYER_2       7
+#define MAP_TILE_COLOR_PLAYER_3       8
+#define MAP_TILE_COLOR_PLAYER_4       9
+#define TEXT_COLOR_TITLE             10
+#define TEXT_COLOR_MAP_NAME          11
+#define TEXT_COLOR_CONTROL_KEY       12
 
 // Player control keys
 #define CONTROL_KEY_UP         'z'
@@ -94,6 +98,11 @@ struct bomb {
     struct coordinates coords;
     int range;
     bool exploded;
+};
+
+struct powerup {
+    bool active;
+    struct coordinates coords;
 };
 
 /**
@@ -122,6 +131,8 @@ struct game {
     int number_of_players;
     int map_height;
     int map_width;
+    struct powerup powerups[MAX_POWERUPS];
+    int powerup_count;
     char map_name[MAX_LENGTH_MAP_NAME];
     char path_to_map_file[MAX_LENGTH_PATH_TO_MAP];
     char map[MAX_MAP_WIDTH][MAX_MAP_HEIGHT];

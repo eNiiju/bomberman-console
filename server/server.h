@@ -147,3 +147,20 @@ void check_game_end(void);
  * @param path_to_map The path to the map's file.
 */
 void retrieve_map_name(char* path_to_map);
+
+/**
+ * Spawn a powerup at the given coordinates, with
+ * a random chance.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
+*/
+void random_spawn_powerup(int x, int y);
+
+/**
+ * Checks if a player is on a powerup, and if it is, gives
+ * the powerup to the player.
+ * @param player_number The player's number.
+ * @param x The x coordinate.
+ * @param y The y coordinate.
+*/
+void check_powerup(int player_number, int x, int y);

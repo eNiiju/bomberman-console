@@ -74,10 +74,11 @@ void* thread_display(void* arg)
 
         move(0, 0);
 
+        display_informations(&game, player_number);
         display_map(&game);
+        display_powerups(&game);
         display_bombs(&game);
         display_players(&game);
-        display_informations(&game, player_number);
 
         refresh();
     }

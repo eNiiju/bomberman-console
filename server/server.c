@@ -13,6 +13,7 @@
 struct game game;
 pthread_mutex_t mut_start_game;
 pthread_mutex_t mut_create_player; // Prevents multiple players from being created with the same number
+pthread_mutex_t mut_spawn_powerup;
 
 
 
@@ -67,6 +68,7 @@ bool setup(char* number_of_players, char* path_to_map_file)
     // Initialize mutexes
     pthread_mutex_init(&mut_start_game, NULL);
     pthread_mutex_init(&mut_create_player, NULL);
+    pthread_mutex_init(&mut_spawn_powerup, NULL);
 
     // Prevent the game from starting
     pthread_mutex_lock(&mut_start_game);
@@ -80,7 +82,8 @@ bool setup(char* number_of_players, char* path_to_map_file)
         .ended = false,
         .winner = -1,
         .player_count = 0,
-        .number_of_players = atoi(number_of_players)
+        .number_of_players = atoi(number_of_players),
+        .powerup_count = 0
     };
     game.msqid = create_message_queue(game.game_code);
     strcpy(game.path_to_map_file, path_to_map_file);
@@ -107,6 +110,7 @@ bool clean_exit()
     // Destroy mutexes
     pthread_mutex_destroy(&mut_start_game);
     pthread_mutex_destroy(&mut_create_player);
+    pthread_mutex_destroy(&mut_spawn_powerup);
 
     return true;
 }
@@ -410,6 +414,12 @@ void* thread_move_player(void* arg)
     case DIRECTION_RIGHT: game.players[player_number].coords.x++; break;
     }
 
+    int x = game.players[player_number].coords.x;
+    int y = game.players[player_number].coords.y;
+
+    // Check if the player picked up a powerup
+    check_powerup(player_number, x, y);
+
     // Check if the player died by moving on a bomb's explosion
     if (check_player_death(player_number)) {
         game.players[player_number].alive = false;
@@ -464,32 +474,40 @@ void* thread_place_bomb(void* arg)
         // Up
         next_x = x; next_y = y - j;
         if (up == j && next_y >= 0 && game.map[next_y][next_x] != MAP_TILE_WALL) {
-            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL) {
+                random_spawn_powerup(next_x, next_y);
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            }
             else up++;
         }
 
         // Down
         next_x = x; next_y = y + j;
         if (down == j && next_y < game.map_height && game.map[next_y][next_x] != MAP_TILE_WALL) {
-            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL) {
+                random_spawn_powerup(next_x, next_y);
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            }
             else down++;
         }
 
         // Left
         next_x = x - j; next_y = y;
         if (left == j && next_x >= 0 && game.map[next_y][next_x] != MAP_TILE_WALL) {
-            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL) {
+                random_spawn_powerup(next_x, next_y);
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            }
             else left++;
         }
 
         // Right
         next_x = x + j; next_y = y;
         if (right == j && next_x < game.map_width && game.map[next_y][next_x] != MAP_TILE_WALL) {
-            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL)
+            if (game.map[next_y][next_x] == MAP_TILE_BREAKABLE_WALL) {
+                random_spawn_powerup(next_x, next_y);
                 game.map[next_y][next_x] = MAP_TILE_EMPTY;
+            }
             else right++;
         }
     }
@@ -606,4 +624,43 @@ void retrieve_map_name(char* path_to_map)
     else
         // The file name is the character after the last '/'
         strcpy(game.map_name, p + 1);
+}
+
+
+
+void random_spawn_powerup(int x, int y)
+{
+    if (rand() % 100 < CHANCE_POWERUP_SPAWN_PERCENT && game.powerup_count < MAX_POWERUPS) {
+        pthread_mutex_lock(&mut_spawn_powerup);
+
+        // Spawn a powerup
+        game.powerups[game.powerup_count] = (struct powerup){
+            .active = true,
+            .coords = {.x = x, .y = y }
+        };
+        game.powerup_count++;
+
+        pthread_mutex_unlock(&mut_spawn_powerup);
+
+        printf("Powerup spawned at (%d, %d)\n", x, y);
+    }
+}
+
+
+
+void check_powerup(int player_number, int x, int y)
+{
+    for (int i = 0; i < game.powerup_count; i++) {
+        if (game.powerups[i].active && game.powerups[i].coords.x == x && game.powerups[i].coords.y == y) {
+            // The player picks up this powerup
+            if (game.players[player_number].bomb_range < MAX_BOMB_RANGE)
+                game.players[player_number].bomb_range++;
+            printf("Player %d picked up a powerup\n", player_number + 1);
+
+            // Mark the powerup as inactive
+            game.powerups[i].active = false;
+
+            break;
+        }
+    }
 }

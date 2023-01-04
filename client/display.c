@@ -22,6 +22,7 @@ void init_display()
     init_pair(MAP_TILE_COLOR_BREAKABLE_WALL, COLOR_BLACK, COLOR_WHITE);
     init_pair(MAP_TILE_COLOR_BOMB, COLOR_YELLOW, COLOR_BLACK);
     init_pair(MAP_TILE_COLOR_EXPLOSION, COLOR_RED, COLOR_BLACK);
+    init_pair(MAP_TILE_COLOR_POWERUP, COLOR_WHITE, COLOR_GREEN);
     init_pair(MAP_TILE_COLOR_PLAYER_1, COLOR_BLUE, COLOR_BLACK);
     init_pair(MAP_TILE_COLOR_PLAYER_2, COLOR_GREEN, COLOR_BLACK);
     init_pair(MAP_TILE_COLOR_PLAYER_3, COLOR_MAGENTA, COLOR_BLACK);
@@ -213,5 +214,20 @@ void display_informations(struct game* game, int player_number)
         attron(COLOR_PAIR(MAP_TILE_COLOR_EXPLOSION));
         printw("You are dead !\n");
         attroff(COLOR_PAIR(MAP_TILE_COLOR_EXPLOSION));
+    }
+}
+
+
+
+void display_powerups(struct game* game)
+{
+    for (int i = 0; i < game->powerup_count; i++) {
+        if (!game->powerups[i].active)
+            continue;
+
+        int x = game->powerups[i].coords.x;
+        int y = game->powerups[i].coords.y;
+
+        print_tile(x, y, MAP_TILE_POWERUP, MAP_TILE_COLOR_POWERUP);
     }
 }
