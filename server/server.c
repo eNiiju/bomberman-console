@@ -98,6 +98,7 @@ bool setup(char* number_of_players, char* path_to_map_file)
 }
 
 
+
 bool clean_exit()
 {
     // Delete the main message queue
@@ -128,8 +129,6 @@ void* thread_player(void* arg)
     // Create player message queue with the client ID as projet ID when generating the token
     create_message_queue(pid_client);
 
-    // Send response to client
-    send_connection_response(game.msqid, true, pid_client);
     printf("Player %d joined the game\n", player_number + 1);
 
     // Wait for client's messages

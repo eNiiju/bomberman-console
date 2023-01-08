@@ -28,6 +28,10 @@ git clone https://github.com/eNiiju/Bombertty.git
 2. Compile the project
 
 ```
+# Install ncurses
+sudo apt-get install libncurses5-dev libncursesw5-dev
+
+# Compile the project
 make
 ```
 
