@@ -13,7 +13,7 @@ graph TD
 
     THREAD_GAME_STATE_MESSAGE[Game state message thread] --> THREAD_GAME_STATE_MESSAGE_A(Initialize display semaphore)
     THREAD_GAME_STATE_MESSAGE_A --> THREAD_GAME_STATE_MESSAGE_B(Wait for game state message)
-    THREAD_GAME_STATE_MESSAGE_B -->|Message received| THREAD_GAME_STATE_MESSAGE_C{Last message? (Stop)}
+    THREAD_GAME_STATE_MESSAGE_B -->|Message received| THREAD_GAME_STATE_MESSAGE_C{Last message? = game ended}
     THREAD_GAME_STATE_MESSAGE_C -->|Yes| THREAD_GAME_STATE_MESSAGE_D(Exit thread)
     THREAD_GAME_STATE_MESSAGE_C -->|No| THREAD_GAME_STATE_MESSAGE_E(Store game state)
     THREAD_GAME_STATE_MESSAGE_E --> THREAD_GAME_STATE_MESSAGE_F(Post display semaphore)

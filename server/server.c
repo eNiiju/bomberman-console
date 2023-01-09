@@ -276,6 +276,10 @@ void* thread_main_message_queue(void* arg)
             bool player_created = create_player(pid_client);
             send_connection_response(game.msqid, player_created, pid_client);
 
+            // Wait for the player count to be incremented
+            pthread_mutex_lock(&mut_create_player);
+            pthread_mutex_unlock(&mut_create_player);
+
             // If the players is now full, unlock the mutex to start the game
             if (game.player_count == game.number_of_players)
                 pthread_mutex_unlock(&mut_start_game);
