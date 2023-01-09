@@ -29,13 +29,6 @@ graph TD
     THREAD_MAIN_MESSAGE_QUEUE_F -->|Success| THREAD_MAIN_MESSAGE_QUEUE_H(Send success connection response to client)
     THREAD_MAIN_MESSAGE_QUEUE_H --> THREAD_MAIN_MESSAGE_QUEUE_I(Unlock start game mutex if the game is now full of players)
 
-    THREAD_GAME[Game thread] --> THREAD_GAME_A(Retrieve map data)
-    THREAD_GAME_A -->|3s| THREAD_GAME_B{Game ended?}
-    THREAD_GAME_B -->|Yes| THREAD_GAME_C(Exit thread)
-    THREAD_GAME_B -->|No| THREAD_GAME_D(Send game state to all clients)
-    THREAD_GAME_D -->|100ms| THREAD_GAME_E(Check end conditions)
-    THREAD_GAME_E --> THREAD_GAME_B
-
     THREAD_PLAYER[Player thread] --> THREAD_PLAYER_A(Create player message queue)
     THREAD_PLAYER_A --> THREAD_PLAYER_B(Start 'move' player message queue thread)
     THREAD_PLAYER_B --> THREAD_PLAYER_C(Start 'place bomb' player message queue thread)
