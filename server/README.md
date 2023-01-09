@@ -4,7 +4,7 @@
 
 ```mermaid
 graph TD
-    MAIN_THREAD[Server main thread] --> MAIN_THREAD_A{Setup:\nValidate arguments, initializations,\nlock start game mutex,\ncreate main message queue, ...}
+    MAIN_THREAD[Server main thread] --> MAIN_THREAD_A{Setup:<br />Validate arguments, initializations,<br />lock start game mutex,<br />create main message queue, ...}
     MAIN_THREAD_A -->|Failure| MAIN_THREAD_B(Exit thread)
     MAIN_THREAD_A -->|Success| MAIN_THREAD_C(Start main message queue thread)
     MAIN_THREAD_C --> MAIN_THREAD_D(Wait for start game mutex to unlock)
