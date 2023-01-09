@@ -158,25 +158,25 @@ void display_informations(struct game* game, int player_number)
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
     printw("%c", CONTROL_KEY_UP);
     attroff(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
-    printw(" : Move up\n", CONTROL_KEY_UP);
+    printw(" : Move up\n");
 
     move(9, game->map_width * MAP_TILE_SIZE_X + 2);
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
     printw("%c", CONTROL_KEY_DOWN);
     attroff(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
-    printw(" : Move down\n", CONTROL_KEY_DOWN);
+    printw(" : Move down\n");
 
     move(10, game->map_width * MAP_TILE_SIZE_X + 2);
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
     printw("%c", CONTROL_KEY_LEFT);
     attroff(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
-    printw(" : Move left\n", CONTROL_KEY_LEFT);
+    printw(" : Move left\n");
 
     move(11, game->map_width * MAP_TILE_SIZE_X + 2);
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
     printw("%c", CONTROL_KEY_RIGHT);
     attroff(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
-    printw(" : Move right\n", CONTROL_KEY_RIGHT);
+    printw(" : Move right\n");
 
     move(12, game->map_width * MAP_TILE_SIZE_X + 2);
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
@@ -188,7 +188,7 @@ void display_informations(struct game* game, int player_number)
     attron(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
     printw("%c", CONTROL_KEY_REFRESH);
     attroff(COLOR_PAIR(TEXT_COLOR_CONTROL_KEY));
-    printw(" : Refresh the display\n", CONTROL_KEY_REFRESH);
+    printw(" : Refresh the display\n");
 
     move(15, game->map_width * MAP_TILE_SIZE_X + 2);
     printw("%d/%d players alive\n", game->player_count, game->number_of_players);
